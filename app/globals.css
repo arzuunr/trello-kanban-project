@@ -2,20 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  background-color: #050505;
-  color: #00ff00;
-  font-family: ui-monospace, monospace;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-@layer components {
-  .neon-border-blue {
-    border: 1px solid #00ff00;
-    box-shadow: 0 0 10px #00ff00;
-  }
-
-  .neon-border-purple {
-    border: 1px solid #bc13fe;
-    box-shadow: 0 0 10px #bc13fe;
-  }
+body {
+  background-color: #050505;
+  color: #ffffff;
+  font-family: ui-monospace, monospace;
 }
