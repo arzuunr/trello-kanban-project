@@ -4,15 +4,14 @@
 
 body {
   background-color: #050505;
-  color: #0ff0fc;
+  color: #00ff00;
   font-family: ui-monospace, monospace;
 }
 
-/* Kartların ve alanların neon parlaması için global yardımcı sınıflar */
 @layer components {
   .neon-border-blue {
-    border: 1px solid #0ff0fc;
-    box-shadow: 0 0 10px #0ff0fc;
+    border: 1px solid #00ff00;
+    box-shadow: 0 0 10px #00ff00;
   }
 
   .neon-border-purple {
