@@ -1,4 +1,18 @@
-/* Tailwind CSS directives */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+body {
+  background-color: #050505 !important;
+  color: #0ff0fc;
+  font-family: ui-monospace, monospace;
+}
+
+@layer utilities {
+  .shadow-neon-blue {
+    box-shadow: 0 0 10px #0ff0fc, 0 0 20px #0ff0fc;
+  }
+  .shadow-neon-purple {
+    box-shadow: 0 0 10px #bc13fe, 0 0 20px #bc13fe;
+  }
+}
