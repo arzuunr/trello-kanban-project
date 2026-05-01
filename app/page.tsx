@@ -34,7 +34,10 @@ export default function Dashboard() {
     const { data } = await supabase.from('boards')
       .insert({ title: newTitle.trim(), user_id: user?.id })
       .select().single()
-    if (data) { setBoards([data, ...boards]); setNewTitle('') }
+    if (data) { 
+      setBoards([data, ...boards])
+      setNewTitle('') 
+    }
   }
 
   const deleteBoard = async (id: string, e: React.MouseEvent) => {
