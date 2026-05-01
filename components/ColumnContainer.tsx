@@ -31,7 +31,7 @@ export default function ColumnContainer({ column, onCardAdd, onCardUpdate, onCar
   }
 
   return (
-    <div ref={setNodeRef} style={style} className="bg-gray-100 rounded-2xl w-72 flex-shrink-0 flex flex-col" style={{ maxHeight: 'calc(100vh - 100px)', ...style }}>
+    <div ref={setNodeRef} className="bg-gray-100 rounded-2xl w-72 flex-shrink-0 flex flex-col" style={{ maxHeight: 'calc(100vh - 100px)', ...style }}>
       {/* Header */}
       <div {...attributes} {...listeners} className="flex items-center justify-between p-3 cursor-grab active:cursor-grabbing select-none">
         {isEditingTitle ? (
