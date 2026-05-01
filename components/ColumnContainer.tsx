@@ -26,49 +26,51 @@ export default function ColumnContainer({ column, onCardAdd, onCardUpdate, onCar
 
   const style = { transform: CSS.Transform.toString(transform), transition }
 
-  if (isDragging) {
-    return <div ref={setNodeRef} style={style} className="bg-gray-200 rounded-2xl w-72 min-h-48 opacity-40 border-2 border-blue-400 border-dashed flex-shrink-0" />
+ if (isDragging) {
+    return <div ref={setNodeRef} style={style} className="bg-academic-gray border border-dashed border-gray-300 rounded-none w-72 min-h-[500px] opacity-40 flex-shrink-0" />
   }
 
   return (
-    <div ref={setNodeRef} className="bg-gray-100 rounded-2xl w-72 flex-shrink-0 flex flex-col" style={{ maxHeight: 'calc(100vh - 100px)', ...style }}>
-      {/* Header */}
-      <div {...attributes} {...listeners} className="flex items-center justify-between p-3 cursor-grab active:cursor-grabbing select-none">
+    <div 
+      ref={setNodeRef} 
+      className="bg-transparent w-72 flex-shrink-0 flex flex-col border-r border-gray-100 px-2" 
+      style={{ maxHeight: 'calc(100vh - 120px)', ...style }}
+    >
+      {/* Header - Teknik ve Minimal */}
+      <div {...attributes} {...listeners} className="flex items-center justify-between p-4 cursor-grab active:cursor-grabbing select-none group">
         {isEditingTitle ? (
           <input
             autoFocus
             value={columnTitle}
             onChange={(e) => setColumnTitle(e.target.value)}
             onBlur={() => { onColumnRename(columnTitle.trim() || column.title); setIsEditingTitle(false) }}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') { onColumnRename(columnTitle.trim() || column.title); setIsEditingTitle(false) }
-              if (e.key === 'Escape') { setColumnTitle(column.title); setIsEditingTitle(false) }
-            }}
-            onPointerDown={(e) => e.stopPropagation()}
-            className="font-semibold text-gray-700 bg-white rounded-lg px-2 py-1 text-sm w-full mr-2 focus:outline-none focus:ring-1 focus:ring-blue-400"
+            className="font-serif italic text-lg bg-white border-b border-black px-1 w-full focus:outline-none"
           />
         ) : (
-          <h3
-            onDoubleClick={(e) => { e.stopPropagation(); setIsEditingTitle(true) }}
-            className="font-semibold text-gray-700 text-sm flex-1"
-          >
-            {column.title}
-          </h3>
+          <div className="flex flex-col">
+             <span className="text-[9px] uppercase tracking-[0.3em] text-gray-300 font-bold mb-1">Section</span>
+             <h3
+                onDoubleClick={(e) => { e.stopPropagation(); setIsEditingTitle(true) }}
+                className="font-serif font-bold text-xl text-black group-hover:italic transition-all"
+              >
+                {column.title}
+              </h3>
+          </div>
         )}
-        <div className="flex items-center gap-1.5 ml-2">
-          <span className="text-xs bg-gray-300 text-gray-600 rounded-full px-2 py-0.5">{column.cards.length}</span>
+        <div className="flex items-center gap-3">
+          <span className="text-[10px] font-mono text-gray-400">[{column.cards.length}]</span>
           <button
             onPointerDown={(e) => e.stopPropagation()}
-            onClick={() => { if (confirm(`"${column.title}" sütununu ve tüm kartlarını silmek istediğinden emin misin?`)) onColumnDelete() }}
-            className="text-gray-400 hover:text-red-500 text-xl leading-none transition-colors"
+            onClick={() => { if (confirm(`Delete section "${column.title}"?`)) onColumnDelete() }}
+            className="text-gray-300 hover:text-black transition-colors text-xl"
           >
             ×
           </button>
         </div>
       </div>
 
-      {/* Cards */}
-      <div className="flex-1 overflow-y-auto px-3 pb-2 flex flex-col gap-2">
+      {/* Cards Area - Daha havadar */}
+      <div className="flex-1 overflow-y-auto px-2 pb-4 flex flex-col gap-4 scrollbar-hide">
         <SortableContext items={column.cards.map(c => c.id)} strategy={verticalListSortingStrategy}>
           {column.cards.map(card => (
             <CardItem
@@ -81,49 +83,41 @@ export default function ColumnContainer({ column, onCardAdd, onCardUpdate, onCar
         </SortableContext>
       </div>
 
-      {/* Add Card */}
-      <div className="p-3 border-t border-gray-200">
+      {/* Add Entry - Metin Odaklı */}
+      <div className="p-4 mt-auto">
         {isAdding ? (
-          <>
+          <div className="bg-white border border-black p-3 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
             <input
               autoFocus
               type="text"
-              placeholder="Kart başlığı..."
+              placeholder="Entry Title..."
               value={newCardTitle}
               onChange={(e) => setNewCardTitle(e.target.value)}
-              onKeyDown={async (e) => {
-                if (e.key === 'Enter' && newCardTitle.trim()) {
-                  await onCardAdd(newCardTitle.trim())
-                  setNewCardTitle('')
-                  setIsAdding(false)
-                }
-                if (e.key === 'Escape') { setNewCardTitle(''); setIsAdding(false) }
-              }}
-              className="w-full border border-gray-200 rounded-xl p-2 text-sm mb-2 focus:outline-none focus:ring-1 focus:ring-blue-400"
+              className="w-full text-sm font-serif italic border-b border-gray-100 pb-1 mb-3 focus:outline-none focus:border-black"
             />
-            <div className="flex gap-2">
+            <div className="flex gap-4">
               <button
                 onClick={async () => {
                   if (newCardTitle.trim()) { await onCardAdd(newCardTitle.trim()); setNewCardTitle(''); setIsAdding(false) }
                 }}
-                className="bg-blue-600 text-white px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-blue-700"
+                className="text-[10px] font-bold uppercase tracking-widest border-b-2 border-black"
               >
-                Ekle
+                Add
               </button>
               <button
                 onClick={() => { setNewCardTitle(''); setIsAdding(false) }}
-                className="text-gray-500 text-xs px-3 py-1.5 rounded-lg hover:bg-gray-200"
+                className="text-[10px] font-bold uppercase tracking-widest text-gray-400"
               >
-                İptal
+                Cancel
               </button>
             </div>
-          </>
+          </div>
         ) : (
           <button
             onClick={() => setIsAdding(true)}
-            className="w-full text-gray-500 hover:text-gray-700 text-sm py-2 hover:bg-gray-200 rounded-xl transition-colors"
+            className="w-full text-left text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 hover:text-black transition-all border-t border-gray-100 pt-4"
           >
-            + Kart Ekle
+            + New Entry
           </button>
         )}
       </div>
