@@ -21,51 +21,56 @@ export default function CardItem({ card, isDragging = false, onUpdate, onDelete 
 
   const style = { transform: CSS.Transform.toString(transform), transition }
 
+  // Sürükleme sırasındaki boşluk (Placeholder)
   if (isSortableDragging) {
-    return <div ref={setNodeRef} style={style} className="bg-blue-100 rounded-xl border-2 border-blue-400 border-dashed min-h-16 opacity-50" />
+    return <div ref={setNodeRef} style={style} className="bg-gray-50 rounded-none border border-dashed border-gray-200 min-h-[100px] opacity-40" />
   }
 
+  // Düzenleme Modu (Minimal Form)
   if (isEditing) {
     return (
-      <div className="bg-white rounded-xl p-3 shadow-md border border-blue-300">
+      <div className="bg-white border border-black p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
         <input
           autoFocus
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          className="w-full border border-gray-200 rounded-lg p-2 text-sm mb-2 focus:outline-none focus:ring-1 focus:ring-blue-400"
-          placeholder="Kart başlığı"
+          className="w-full border-b border-gray-100 py-2 text-sm font-serif italic mb-2 focus:outline-none focus:border-black"
+          placeholder="Entry Title"
         />
         <textarea
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          placeholder="Açıklama (opsiyonel)..."
-          className="w-full border border-gray-200 rounded-lg p-2 text-sm mb-3 resize-none focus:outline-none focus:ring-1 focus:ring-blue-400"
+          className="w-full border-none text-xs font-sans text-gray-600 mb-4 resize-none focus:outline-none"
           rows={3}
+          placeholder="Add observations..."
         />
-        <div className="flex gap-2">
+        <div className="flex justify-between items-center pt-2 border-t border-gray-50">
+           <div className="flex gap-4">
+            <button
+              onClick={() => { onUpdate?.({ title: title.trim() || card.title, description }); setIsEditing(false) }}
+              className="text-[10px] font-bold uppercase tracking-widest border-b-2 border-black"
+            >
+              Save
+            </button>
+            <button
+              onClick={() => setIsEditing(false)}
+              className="text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-black"
+            >
+              Cancel
+            </button>
+          </div>
           <button
-            onClick={() => { onUpdate?.({ title: title.trim() || card.title, description }); setIsEditing(false) }}
-            className="bg-blue-600 text-white px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-blue-700"
+            onClick={() => { if (confirm('Discard this entry?')) onDelete?.() }}
+            className="text-[10px] font-bold uppercase tracking-widest text-red-800"
           >
-            Kaydet
-          </button>
-          <button
-            onClick={() => { setTitle(card.title); setDescription(card.description || ''); setIsEditing(false) }}
-            className="text-gray-500 text-xs px-3 py-1.5 rounded-lg hover:bg-gray-100"
-          >
-            İptal
-          </button>
-          <button
-            onClick={() => { if (confirm('Kartı sil?')) onDelete?.() }}
-            className="ml-auto text-red-400 text-xs px-3 py-1.5 rounded-lg hover:bg-red-50"
-          >
-            Sil
+            Delete
           </button>
         </div>
       </div>
     )
   }
 
+  // Normal Görünüm (Academic Card)
   return (
     <div
       ref={setNodeRef}
@@ -73,15 +78,26 @@ export default function CardItem({ card, isDragging = false, onUpdate, onDelete 
       {...attributes}
       {...listeners}
       onDoubleClick={() => setIsEditing(true)}
-      className={`bg-white rounded-xl p-3 shadow-sm cursor-grab active:cursor-grabbing hover:shadow-md transition-all border border-transparent hover:border-blue-200 group ${isDragging ? 'rotate-2 shadow-xl scale-105' : ''}`}
+      className={`bg-white p-5 border border-gray-100 hover:border-black transition-all cursor-grab active:cursor-grabbing group shadow-sm hover:shadow-none ${isDragging ? 'z-50 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]' : ''}`}
     >
-      <p className="text-sm font-medium text-gray-800 leading-snug">{card.title}</p>
+      <h4 className="text-sm font-serif font-bold leading-tight mb-2 group-hover:italic transition-all">
+        {card.title}
+      </h4>
+      
       {card.description && (
-        <p className="text-xs text-gray-400 mt-1.5 line-clamp-2 leading-relaxed">{card.description}</p>
+        <p className="text-xs text-gray-500 font-sans leading-relaxed line-clamp-3 mb-3">
+          {card.description}
+        </p>
       )}
-      <p className="text-xs text-gray-300 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
-        ✏️ Düzenlemek için çift tıkla
-      </p>
+
+      <div className="flex justify-between items-center mt-auto pt-3 border-t border-gray-50 opacity-0 group-hover:opacity-100 transition-opacity">
+        <span className="text-[9px] uppercase tracking-tighter text-gray-300 font-bold">
+          Ref: {card.id.slice(0, 5)}
+        </span>
+        <span className="text-[9px] uppercase tracking-widest text-black font-bold">
+          Edit Entry →
+        </span>
+      </div>
     </div>
   )
 }
