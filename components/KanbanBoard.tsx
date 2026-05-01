@@ -36,9 +36,19 @@ export default function KanbanBoard({ initialColumns, boardId }: Props) {
   const [activeColumn, setActiveColumn] = useState<ColumnType | null>(null)
   const [newColTitle, setNewColTitle] = useState('')
 
+  // Sürükleme Hassasiyeti Ayarları (Sensor Fix)
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
-    useSensor(TouchSensor, { activationConstraint: { delay: 250, tolerance: 5 } })
+    useSensor(PointerSensor, { 
+      activationConstraint: { 
+        distance: 3 // 3 piksel hareket edince anında algılar
+      } 
+    }),
+    useSensor(TouchSensor, { 
+      activationConstraint: { 
+        delay: 200, // Mobilde uzun basma süresi
+        tolerance: 5 
+      } 
+    })
   )
 
   const handleDragStart = (event: DragStartEvent) => {
@@ -124,8 +134,17 @@ export default function KanbanBoard({ initialColumns, boardId }: Props) {
   }
 
   return (
-    <DndContext sensors={sensors} collisionDetection={closestCorners} onDragStart={handleDragStart} onDragOver={handleDragOver} onDragEnd={handleDragEnd}>
-      <div className="flex gap-0 p-8 overflow-x-auto items-start bg-academic-light" style={{ minHeight: 'calc(100vh - 80px)' }}>
+    <DndContext 
+      sensors={sensors} 
+      collisionDetection={closestCorners} 
+      onDragStart={handleDragStart} 
+      onDragOver={handleDragOver} 
+      onDragEnd={handleDragEnd}
+    >
+      <div 
+        className="flex gap-4 p-8 overflow-x-auto items-start bg-cyber-black" 
+        style={{ minHeight: 'calc(100vh - 80px)' }}
+      >
         <SortableContext items={columns.map(c => c.id)} strategy={horizontalListSortingStrategy}>
           {columns.map(column => (
             <ColumnContainer
@@ -167,22 +186,25 @@ export default function KanbanBoard({ initialColumns, boardId }: Props) {
           ))}
         </SortableContext>
 
-        {/* Add Section - Minimalist Control */}
-        <div className="flex-shrink-0 w-80 px-6 py-4">
-          <div className="border-t-2 border-black pt-6">
+        {/* Add Section - Terminal Style */}
+        <div className="flex-shrink-0 w-80">
+          <div className="border border-cyber-border bg-cyber-dark p-6 shadow-[0_0_15px_rgba(15,240,252,0.1)]">
+            <h3 className="text-cyber-neonPurple font-mono text-[10px] uppercase mb-4 tracking-[0.2em]">
+              {">"} INITIALIZE_SECTION
+            </h3>
             <input
               type="text"
-              placeholder="New Section Title..."
+              placeholder="SECTION_NAME..."
               value={newColTitle}
               onChange={(e) => setNewColTitle(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && addColumn()}
-              className="w-full bg-transparent border-none text-lg font-serif italic mb-4 focus:outline-none placeholder:text-gray-200"
+              className="w-full bg-black border border-cyber-border rounded-none p-2 mb-4 text-cyber-neonBlue font-mono text-sm focus:outline-none focus:border-cyber-neonBlue transition-colors"
             />
             <button
               onClick={addColumn}
-              className="text-[10px] font-bold uppercase tracking-[0.2em] border border-black px-4 py-2 hover:bg-black hover:text-white transition-all"
+              className="w-full text-[10px] font-mono font-bold uppercase border border-cyber-neonBlue text-cyber-neonBlue px-4 py-2 hover:bg-cyber-neonBlue hover:text-black transition-all shadow-[0_0_10px_rgba(15,240,252,0.3)]"
             >
-              Add Section
+              [ EXECUTE_ADD ]
             </button>
           </div>
         </div>
@@ -191,9 +213,13 @@ export default function KanbanBoard({ initialColumns, boardId }: Props) {
       <DragOverlay>
         {activeCard && <CardItem card={activeCard} isDragging />}
         {activeColumn && (
-          <div className="bg-white border border-black p-8 shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] w-72">
-             <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Moving Section</span>
-             <h3 className="font-serif font-bold text-2xl italic">{activeColumn.title}</h3>
+          <div className="bg-cyber-dark border border-cyber-neonPurple p-8 shadow-neon-purple w-72">
+             <span className="text-[10px] font-mono font-bold uppercase text-cyber-neonPurple animate-pulse italic">
+                RELOCATING_CORE_SECTION...
+             </span>
+             <h3 className="text-white font-mono font-bold text-2xl mt-2 tracking-tighter">
+                {activeColumn.title}
+             </h3>
           </div>
         )}
       </DragOverlay>
