@@ -47,62 +47,231 @@ export default function Dashboard() {
   const colors = ['bg-blue-500','bg-purple-500','bg-green-500','bg-orange-500','bg-pink-500','bg-teal-500']
 
   return (
-    <div className="min-h-screen bg-academic-light text-academic-dark font-sans">
-      <header className="border-b border-gray-200 px-8 py-6 flex justify-between items-center bg-white">
-        <h1 className="text-2xl font-serif font-bold tracking-tight text-black">TaskFlow</h1>
-        <div className="flex items-center gap-6">
-          <span className="text-xs uppercase tracking-widest text-gray-400 font-medium">{userEmail}</span>
-          <button
-            onClick={async () => { await supabase.auth.signOut(); router.push('/login') }}
-            className="text-xs uppercase tracking-widest font-bold border-b-2 border-black pb-1 hover:text-academic-accent hover:border-academic-accent transition-all"
-          >
-            LOGOUT
-          </button>
-        </div>
-      </header>
+    'use client'
+import { useState } from 'react'
+import {
+  DndContext, DragOverlay, PointerSensor, TouchSensor,
+  useSensor, useSensors, DragStartEvent, DragEndEvent, DragOverEvent,
+  closestCorners,
+} from '@dnd-kit/core'
+import { SortableContext, horizontalListSortingStrategy, arrayMove } from '@dnd-kit/sortable'
+import { supabase } from '@/lib/supabase'
+import ColumnContainer from './ColumnContainer'
+import CardItem from './CardItem'
 
-      <main className="max-w-6xl mx-auto p-12">
-        <div className="mb-16">
-          <h2 className="text-4xl font-serif mb-2 italic">Dashboard</h2>
-          <p className="text-cyber-neonBlue font-mono tracking-tighter animate-pulse">  {`// SYSTEM_STATUS: READY > EXECUTE_TASKS_IN_NEON_FLOW`}</p>
-        </div>
+export interface CardType {
+  id: string
+  column_id: string
+  title: string
+  description: string | null
+  position: number
+}
 
-        {/* Input Alanı: Daha minimal, sadece alt çizgi tarzı */}
-        <div className="flex gap-4 mb-12 border-b border-gray-100 pb-8">
-          <input
-            type="text"
-            placeholder="New Project Title..."
-            value={newTitle}
-            onChange={(e) => setNewTitle(e.target.value)}
-            className="flex-1 bg-transparent border-none text-xl font-serif italic focus:outline-none placeholder:text-gray-200"
-          />
-          <button
-            onClick={createBoard}
-            className="bg-black text-white px-8 py-3 text-xs font-bold uppercase tracking-widest hover:bg-gray-800 transition-colors"
-          >
-            Create Board
-          </button>
-        </div>
+export interface ColumnType {
+  id: string
+  title: string
+  position: number
+  cards: CardType[]
+}
 
-        {/* Boards Grid: Daha sade, beyaz kağıt efekti */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {boards.map((board) => (
-            <div
-              key={board.id}
-              onClick={() => router.push(`/board/${board.id}`)}
-              className="group border border-gray-100 p-8 hover:border-black transition-all cursor-pointer bg-white"
-            >
-              <div className="flex justify-between items-start mb-4">
-                <h3 className="font-serif text-2xl group-hover:italic transition-all">{board.title}</h3>
-                <button onClick={(e) => deleteBoard(board.id, e)} className="text-gray-200 hover:text-black">×</button>
-              </div>
-              <p className="text-[10px] uppercase tracking-[0.2em] text-gray-400">
-                Created: {new Date(board.created_at).toLocaleDateString('en-US')}
-              </p>
-            </div>
+interface Props {
+  initialColumns: ColumnType[]
+  boardId: string
+}
+
+export default function KanbanBoard({ initialColumns, boardId }: Props) {
+  const [columns, setColumns] = useState<ColumnType[]>(initialColumns)
+  const [activeCard, setActiveCard] = useState<CardType | null>(null)
+  const [activeColumn, setActiveColumn] = useState<ColumnType | null>(null)
+  const [newColTitle, setNewColTitle] = useState('')
+
+  // Sürükleme Hassasiyeti Ayarları (Sensor Fix)
+  const sensors = useSensors(
+    useSensor(PointerSensor, { 
+      activationConstraint: { 
+        distance: 3 // 3 piksel hareket edince anında algılar
+      } 
+    }),
+    useSensor(TouchSensor, { 
+      activationConstraint: { 
+        delay: 200, // Mobilde uzun basma süresi
+        tolerance: 5 
+      } 
+    })
+  )
+
+  const handleDragStart = (event: DragStartEvent) => {
+    if (event.active.data.current?.type === 'Card') setActiveCard(event.active.data.current.card)
+    if (event.active.data.current?.type === 'Column') setActiveColumn(event.active.data.current.column)
+  }
+
+  const handleDragOver = (event: DragOverEvent) => {
+    const { active, over } = event
+    if (!over || active.id === over.id) return
+    if (active.data.current?.type !== 'Card') return
+
+    const isOverCard = over.data.current?.type === 'Card'
+    const isOverColumn = over.data.current?.type === 'Column'
+
+    setColumns(cols => {
+      const newCols = cols.map(c => ({ ...c, cards: [...c.cards] }))
+      const aColIdx = newCols.findIndex(c => c.cards.some(card => card.id === active.id))
+      if (aColIdx === -1) return cols
+      const aCardIdx = newCols[aColIdx].cards.findIndex(c => c.id === active.id)
+
+      if (isOverCard) {
+        const oColIdx = newCols.findIndex(c => c.cards.some(card => card.id === over.id))
+        if (oColIdx === -1) return cols
+        const oCardIdx = newCols[oColIdx].cards.findIndex(c => c.id === over.id)
+        if (aColIdx === oColIdx) {
+          newCols[aColIdx].cards = arrayMove(newCols[aColIdx].cards, aCardIdx, oCardIdx)
+        } else {
+          const [moved] = newCols[aColIdx].cards.splice(aCardIdx, 1)
+          moved.column_id = newCols[oColIdx].id
+          newCols[oColIdx].cards.splice(oCardIdx, 0, moved)
+        }
+      }
+
+      if (isOverColumn) {
+        const oColIdx = newCols.findIndex(c => c.id === over.id)
+        if (oColIdx === -1 || aColIdx === oColIdx) return cols
+        const [moved] = newCols[aColIdx].cards.splice(aCardIdx, 1)
+        moved.column_id = newCols[oColIdx].id
+        newCols[oColIdx].cards.push(moved)
+      }
+
+      return newCols
+    })
+  }
+
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event
+    setActiveCard(null)
+    setActiveColumn(null)
+    if (!over) return
+
+    if (active.data.current?.type === 'Column') {
+      const aIdx = columns.findIndex(c => c.id === active.id)
+      const oIdx = columns.findIndex(c => c.id === over.id)
+      if (aIdx !== oIdx) {
+        const newCols = arrayMove(columns, aIdx, oIdx)
+        setColumns(newCols)
+        newCols.forEach((col, idx) => {
+          supabase.from('columns').update({ position: idx + 1 }).eq('id', col.id).then()
+        })
+      }
+      return
+    }
+
+    if (active.data.current?.type === 'Card') {
+      columns.forEach((col) => {
+        col.cards.forEach((card, idx) => {
+          supabase.from('cards').update({ column_id: col.id, position: idx + 1 }).eq('id', card.id).then()
+        })
+      })
+    }
+  }
+
+  const addColumn = async () => {
+    if (!newColTitle.trim()) return
+    const maxPos = columns.length > 0 ? Math.max(...columns.map(c => c.position)) : 0
+    const { data } = await supabase
+      .from('columns')
+      .insert({ board_id: boardId, title: newColTitle.trim(), position: maxPos + 1 })
+      .select().single()
+    if (data) { setColumns([...columns, { ...data, cards: [] }]); setNewColTitle('') }
+  }
+
+  return (
+    <DndContext 
+      sensors={sensors} 
+      collisionDetection={closestCorners} 
+      onDragStart={handleDragStart} 
+      onDragOver={handleDragOver} 
+      onDragEnd={handleDragEnd}
+    >
+      <div 
+        className="flex gap-4 p-8 overflow-x-auto items-start bg-cyber-black" 
+        style={{ minHeight: 'calc(100vh - 80px)' }}
+      >
+        <SortableContext items={columns.map(c => c.id)} strategy={horizontalListSortingStrategy}>
+          {columns.map(column => (
+            <ColumnContainer
+              key={column.id}
+              column={column}
+              onColumnDelete={async () => {
+                await supabase.from('columns').delete().eq('id', column.id)
+                setColumns(cols => cols.filter(c => c.id !== column.id))
+              }}
+              onColumnRename={(title) => {
+                setColumns(cols => cols.map(c => c.id === column.id ? { ...c, title } : c))
+                supabase.from('columns').update({ title }).eq('id', column.id)
+              }}
+              onCardAdd={async (title) => {
+                const maxPos = column.cards.length > 0 ? Math.max(...column.cards.map(c => c.position)) : 0
+                const { data } = await supabase
+                  .from('cards')
+                  .insert({ column_id: column.id, title, position: maxPos + 1 })
+                  .select().single()
+                if (data) {
+                  setColumns(cols => cols.map(c => c.id === column.id ? { ...c, cards: [...c.cards, data] } : c))
+                }
+              }}
+              onCardUpdate={(cardId, updates) => {
+                setColumns(cols => cols.map(c => ({
+                  ...c,
+                  cards: c.cards.map(card => card.id === cardId ? { ...card, ...updates } : card)
+                })))
+                supabase.from('cards').update(updates).eq('id', cardId)
+              }}
+              onCardDelete={(cardId) => {
+                setColumns(cols => cols.map(c => ({
+                  ...c,
+                  cards: c.cards.filter(card => card.id !== cardId)
+                })))
+                supabase.from('cards').delete().eq('id', cardId)
+              }}
+            />
           ))}
+        </SortableContext>
+
+        {/* Add Section - Terminal Style */}
+        <div className="flex-shrink-0 w-80">
+          <div className="border border-cyber-border bg-cyber-dark p-6 shadow-[0_0_15px_rgba(15,240,252,0.1)]">
+            <h3 className="text-cyber-neonPurple font-mono text-[10px] uppercase mb-4 tracking-[0.2em]">
+              {">"} INITIALIZE_SECTION
+            </h3>
+            <input
+              type="text"
+              placeholder="SECTION_NAME..."
+              value={newColTitle}
+              onChange={(e) => setNewColTitle(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && addColumn()}
+              className="w-full bg-black border border-cyber-border rounded-none p-2 mb-4 text-cyber-neonBlue font-mono text-sm focus:outline-none focus:border-cyber-neonBlue transition-colors"
+            />
+            <button
+              onClick={addColumn}
+              className="w-full text-[10px] font-mono font-bold uppercase border border-cyber-neonBlue text-cyber-neonBlue px-4 py-2 hover:bg-cyber-neonBlue hover:text-black transition-all shadow-[0_0_10px_rgba(15,240,252,0.3)]"
+            >
+              [ EXECUTE_ADD ]
+            </button>
+          </div>
         </div>
-      </main>
-    </div>
+      </div>
+
+      <DragOverlay>
+        {activeCard && <CardItem card={activeCard} isDragging />}
+        {activeColumn && (
+          <div className="bg-cyber-dark border border-cyber-neonPurple p-8 shadow-neon-purple w-72">
+             <span className="text-[10px] font-mono font-bold uppercase text-cyber-neonPurple animate-pulse italic">
+                RELOCATING_CORE_SECTION...
+             </span>
+             <h3 className="text-white font-mono font-bold text-2xl mt-2 tracking-tighter">
+                {activeColumn.title}
+             </h3>
+          </div>
+        )}
+      </DragOverlay>
+    </DndContext>
   )
 }
