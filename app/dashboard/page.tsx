@@ -46,76 +46,62 @@ export default function Dashboard() {
 
   const colors = ['bg-blue-500','bg-purple-500','bg-green-500','bg-orange-500','bg-pink-500','bg-teal-500']
 
-  return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white shadow-sm px-6 py-4 flex justify-between items-center">
-        <h1 className="text-xl font-bold text-blue-600">TaskFlow</h1>
-        <div className="flex items-center gap-4">
-          <span className="text-sm text-gray-500 hidden sm:block">{userEmail}</span>
-          <button
-            onClick={async () => { await supabase.auth.signOut(); router.push('/login') }}
-            className="text-sm text-gray-500 hover:text-gray-800 border border-gray-200 px-3 py-1.5 rounded-lg hover:bg-gray-50"
+return (
+  <div className="min-h-screen bg-academic-light text-academic-dark font-sans">
+    <header className="border-b border-gray-200 px-8 py-6 flex justify-between items-center bg-white">
+      <h1 className="text-2xl font-serif font-bold tracking-tight text-black">TaskFlow</h1>
+      <div className="flex items-center gap-6">
+        <span className="text-xs uppercase tracking-widest text-gray-400 font-medium">{userEmail}</span>
+        <button
+          onClick={async () => { await supabase.auth.signOut(); router.push('/login') }}
+          className="text-xs uppercase tracking-widest font-bold border-b-2 border-black pb-1 hover:text-academic-accent hover:border-academic-accent transition-all"
+        >
+          LOGOUT
+        </button>
+      </div>
+    </header>
+
+    <main className="max-w-6xl mx-auto p-12">
+      <div className="mb-16">
+        <h2 className="text-4xl font-serif mb-2 italic">Dashboard</h2>
+        <p className="text-gray-500 font-sans tracking-tight">Manage your projects with academic precision.</p>
+      </div>
+
+      {/* Input Alanı: Daha minimal, sadece alt çizgi tarzı */}
+      <div className="flex gap-4 mb-12 border-b border-gray-100 pb-8">
+        <input
+          type="text"
+          placeholder="New Project Title..."
+          value={newTitle}
+          onChange={(e) => setNewTitle(e.target.value)}
+          className="flex-1 bg-transparent border-none text-xl font-serif italic focus:outline-none placeholder:text-gray-200"
+        />
+        <button
+          onClick={createBoard}
+          className="bg-black text-white px-8 py-3 text-xs font-bold uppercase tracking-widest hover:bg-gray-800 transition-colors"
+        >
+          Create Board
+        </button>
+      </div>
+
+      {/* Boards Grid: Daha sade, beyaz kağıt efekti */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {boards.map((board) => (
+          <div
+            key={board.id}
+            onClick={() => router.push(`/board/${board.id}`)}
+            className="group border border-gray-100 p-8 hover:border-black transition-all cursor-pointer bg-white"
           >
-            Çıkış Yap
-          </button>
-        </div>
-      </header>
-
-      <main className="max-w-5xl mx-auto p-6">
-        <h2 className="text-2xl font-bold text-gray-800 mb-6">Tahtalarım</h2>
-
-        <div className="flex gap-3 mb-8">
-          <input
-            type="text"
-            placeholder="Yeni tahta adı..."
-            value={newTitle}
-            onChange={(e) => setNewTitle(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && createBoard()}
-            className="flex-1 border border-gray-200 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-          />
-          <button
-            onClick={createBoard}
-            className="bg-blue-600 text-white px-6 py-3 rounded-xl font-medium hover:bg-blue-700 whitespace-nowrap text-sm"
-          >
-            + Tahta Oluştur
-          </button>
-        </div>
-
-        {loading ? (
-          <p className="text-gray-400 text-center py-16">Yükleniyor...</p>
-        ) : boards.length === 0 ? (
-          <div className="text-center py-16">
-            <p className="text-4xl mb-4">📋</p>
-            <p className="text-gray-500">Henüz tahta yok. İlk tahtanı oluştur!</p>
+            <div className="flex justify-between items-start mb-4">
+              <h3 className="font-serif text-2xl group-hover:italic transition-all">{board.title}</h3>
+              <button onClick={(e) => deleteBoard(board.id, e)} className="text-gray-200 hover:text-black">×</button>
+            </div>
+            <p className="text-[10px] uppercase tracking-[0.2em] text-gray-400">
+              Created: {new Date(board.created_at).toLocaleDateString('en-US')}
+            </p>
           </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {boards.map((board, i) => (
-              <div
-                key={board.id}
-                onClick={() => router.push(`/board/${board.id}`)}
-                className="bg-white rounded-2xl shadow-sm hover:shadow-md cursor-pointer border border-gray-100 overflow-hidden transition-all hover:-translate-y-0.5"
-              >
-                <div className={`h-2 ${colors[i % colors.length]}`} />
-                <div className="p-5 flex justify-between items-start">
-                  <div>
-                    <h3 className="font-semibold text-gray-800">{board.title}</h3>
-                    <p className="text-xs text-gray-400 mt-1">
-                      {new Date(board.created_at).toLocaleDateString('tr-TR')}
-                    </p>
-                  </div>
-                  <button
-                    onClick={(e) => deleteBoard(board.id, e)}
-                    className="text-gray-300 hover:text-red-500 text-lg leading-none"
-                  >
-                    ×
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </main>
-    </div>
-  )
-}
+        ))}
+      </div>
+    </main>
+  </div>
+);
