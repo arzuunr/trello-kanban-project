@@ -36,18 +36,18 @@ export default function KanbanBoard({ initialColumns, boardId }: Props) {
   const [activeColumn, setActiveColumn] = useState<ColumnType | null>(null)
   const [newColTitle, setNewColTitle] = useState('')
 
-  // Sürükleme Hassasiyeti Ayarları (Sensor Fix)
+  // KanbanBoard.tsx içinde sensörleri güncelle:
   const sensors = useSensors(
-    useSensor(PointerSensor, { 
-      activationConstraint: { 
-        distance: 3 // 3 piksel hareket edince anında algılar
-      } 
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 0.1, // Neredeyse hiç mesafe bekleme (anında sürükle)
+      },
     }),
-    useSensor(TouchSensor, { 
-      activationConstraint: { 
-        delay: 200, // Mobilde uzun basma süresi
-        tolerance: 5 
-      } 
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 50, // Dokunma için minimum gecikme
+        tolerance: 5,
+      },
     })
   )
 
