@@ -64,7 +64,7 @@ export default function Dashboard() {
       <main className="max-w-6xl mx-auto p-12">
         <div className="mb-16">
           <h2 className="text-4xl font-serif mb-2 italic">Dashboard</h2>
-          <p className="text-gray-500 font-sans tracking-tight">Manage your projects with academic precision.</p>
+          <p className="text-cyber-neonBlue font-mono tracking-tighter animate-pulse">  {`// SYSTEM_STATUS: READY > EXECUTE_TASKS_IN_NEON_FLOW`}</p>
         </div>
 
         {/* Input Alanı: Daha minimal, sadece alt çizgi tarzı */}
