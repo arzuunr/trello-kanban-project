@@ -58,5 +58,6 @@ return (
       </div>
     </div>
   </div>
-);
+)
+}
 
