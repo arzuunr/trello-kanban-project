@@ -26,50 +26,37 @@ export default function LoginPage() {
     setLoading(false)
   }
 
-  return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      <div className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-blue-600">TaskFlow</h1>
-          <p className="text-gray-500 mt-1">{isRegister ? 'Yeni hesap oluştur' : 'Hesabına giriş yap'}</p>
-        </div>
-        <input
-          type="email"
-          placeholder="E-posta"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="w-full border border-gray-200 rounded-xl p-3 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+  // app/login/page.tsx return kısmı
+return (
+  <div className="min-h-screen bg-cyber-black flex items-center justify-center font-mono">
+    <div className="w-full max-w-md p-8 border border-cyber-neonBlue shadow-neon-blue bg-cyber-dark">
+      <h1 className="text-3xl font-bold text-cyber-neonBlue mb-2 tracking-widest uppercase">
+        ACCESS_GRANTED
+      </h1>
+      <p className="text-gray-500 text-xs mb-8 italic">{`// Please authenticate to enter the terminal`}</p>
+      
+      <div className="space-y-6">
+        <input 
+          type="email" 
+          placeholder="USER_ID (Email)"
+          className="w-full bg-black border border-cyber-border p-3 text-cyber-neonBlue focus:border-cyber-neonPurple focus:outline-none transition-all"
         />
-        <input
-          type="password"
-          placeholder="Şifre (min. 6 karakter)"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
-          className="w-full border border-gray-200 rounded-xl p-3 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+        <input 
+          type="password" 
+          placeholder="SECURITY_KEY (Password)"
+          className="w-full bg-black border border-cyber-border p-3 text-cyber-neonBlue focus:border-cyber-neonPurple focus:outline-none transition-all"
         />
-        {error && (
-          <div className="bg-red-50 border border-red-200 text-red-600 text-sm p-3 rounded-xl mb-4">
-            {error}
-          </div>
-        )}
-        <button
-          onClick={handleSubmit}
-          disabled={loading}
-          className="w-full bg-blue-600 text-white p-3 rounded-xl font-semibold hover:bg-blue-700 disabled:opacity-50 transition-colors"
-        >
-          {loading ? 'Bekleyin...' : isRegister ? 'Kayıt Ol' : 'Giriş Yap'}
+        <button className="w-full bg-cyber-neonBlue text-black font-bold py-3 hover:bg-white transition-all shadow-neon-blue">
+          INITIALIZE_LOGIN
         </button>
-        <p className="text-center mt-5 text-sm text-gray-500">
-          {isRegister ? 'Zaten hesabın var mı?' : 'Hesabın yok mu?'}
-          <button
-            onClick={() => { setIsRegister(!isRegister); setError('') }}
-            className="text-blue-600 ml-1 font-medium hover:underline"
-          >
-            {isRegister ? 'Giriş Yap' : 'Kayıt Ol'}
-          </button>
+      </div>
+      
+      <div className="mt-8 text-center">
+        <p className="text-[10px] text-gray-600 uppercase tracking-widest">
+          Auth_Secure_Protocol_v4.0
         </p>
       </div>
     </div>
-  )
-}
+  </div>
+);
+
