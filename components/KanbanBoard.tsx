@@ -86,44 +86,32 @@ export default function KanbanBoard({ initialColumns, boardId }: Props) {
   }
 
   const handleDragEnd = async (event: DragEndEvent) => {
-  const { active, over } = event;
-  setActiveCard(null);
-  setActiveColumn(null);
-  if (!over) return;
+    const { active, over } = event
+    setActiveCard(null)
+    setActiveColumn(null)
+    if (!over) return
 
-  // 1. Sütun Sıralamasını Kaydet
-  if (active.data.current?.type === 'Column') {
-    const aIdx = columns.findIndex(c => c.id === active.id);
-    const oIdx = columns.findIndex(c => c.id === over.id);
-    if (aIdx !== oIdx) {
-      const newCols = arrayMove(columns, aIdx, oIdx);
-      setColumns(newCols);
-      // Veritabanında tüm sütun pozisyonlarını güncelle
-      newCols.forEach((col, idx) => {
-        supabase.from('columns').update({ position: idx + 1 }).eq('id', col.id).then();
-      });
+    if (active.data.current?.type === 'Column') {
+      const aIdx = columns.findIndex(c => c.id === active.id)
+      const oIdx = columns.findIndex(c => c.id === over.id)
+      if (aIdx !== oIdx) {
+        const newCols = arrayMove(columns, aIdx, oIdx)
+        setColumns(newCols)
+        newCols.forEach((col, idx) => {
+          supabase.from('columns').update({ position: idx + 1 }).eq('id', col.id).then()
+        })
+      }
+      return
     }
-    return;
-  }
 
-  // 2. Kart Sıralamasını ve Sütununu Kaydet
-  if (active.data.current?.type === 'Card') {
-    // Sürükleme bittiğinde tüm sütunlardaki tüm kartların pozisyonlarını veritabanına yazıyoruz
-    columns.forEach((col) => {
-      col.cards.forEach((card, idx) => {
-        // Kartın hem hangi sütunda olduğunu hem de o sütundaki sırasını kaydediyoruz
-        supabase
-          .from('cards')
-          .update({ 
-            column_id: col.id, // Kartın içinde bulunduğu güncel sütun
-            position: idx + 1  // Kartın o sütundaki güncel sırası
-          })
-          .eq('id', card.id)
-          .then();
+    if (active.data.current?.type === 'Card') {
+      columns.forEach((col) => {
+        col.cards.forEach((card, idx) => {
+          supabase.from('cards').update({ column_id: col.id, position: idx + 1 }).eq('id', card.id).then()
+        })
       })
-    })
+    }
   }
-}
 
   const addColumn = async () => {
     if (!newColTitle.trim()) return
@@ -137,7 +125,7 @@ export default function KanbanBoard({ initialColumns, boardId }: Props) {
 
   return (
     <DndContext sensors={sensors} collisionDetection={closestCorners} onDragStart={handleDragStart} onDragOver={handleDragOver} onDragEnd={handleDragEnd}>
-      <div className="flex gap-4 p-6 overflow-x-auto items-start" style={{ minHeight: 'calc(100vh - 60px)' }}>
+      <div className="flex gap-0 p-8 overflow-x-auto items-start bg-academic-light" style={{ minHeight: 'calc(100vh - 80px)' }}>
         <SortableContext items={columns.map(c => c.id)} strategy={horizontalListSortingStrategy}>
           {columns.map(column => (
             <ColumnContainer
@@ -179,22 +167,22 @@ export default function KanbanBoard({ initialColumns, boardId }: Props) {
           ))}
         </SortableContext>
 
-        {/* Add Column */}
-        <div className="flex-shrink-0 w-72">
-          <div className="bg-gray-100 rounded-2xl p-3">
+        {/* Add Section - Minimalist Control */}
+        <div className="flex-shrink-0 w-80 px-6 py-4">
+          <div className="border-t-2 border-black pt-6">
             <input
               type="text"
-              placeholder="Yeni sütun adı..."
+              placeholder="New Section Title..."
               value={newColTitle}
               onChange={(e) => setNewColTitle(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && addColumn()}
-              className="w-full border border-gray-200 rounded-xl p-2 mb-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400"
+              className="w-full bg-transparent border-none text-lg font-serif italic mb-4 focus:outline-none placeholder:text-gray-200"
             />
             <button
               onClick={addColumn}
-              className="w-full bg-blue-600 text-white py-2 rounded-xl text-sm font-medium hover:bg-blue-700"
+              className="text-[10px] font-bold uppercase tracking-[0.2em] border border-black px-4 py-2 hover:bg-black hover:text-white transition-all"
             >
-              + Sütun Ekle
+              Add Section
             </button>
           </div>
         </div>
@@ -202,7 +190,12 @@ export default function KanbanBoard({ initialColumns, boardId }: Props) {
 
       <DragOverlay>
         {activeCard && <CardItem card={activeCard} isDragging />}
-        {activeColumn && <div className="bg-gray-300 rounded-2xl w-72 h-32 opacity-80 rotate-2 shadow-2xl" />}
+        {activeColumn && (
+          <div className="bg-white border border-black p-8 shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] w-72">
+             <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Moving Section</span>
+             <h3 className="font-serif font-bold text-2xl italic">{activeColumn.title}</h3>
+          </div>
+        )}
       </DragOverlay>
     </DndContext>
   )
