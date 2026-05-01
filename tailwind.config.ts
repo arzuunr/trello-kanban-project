@@ -1,30 +1,19 @@
-import type { Config } from "tailwindcss";
-
-const config: Config = {
-  content: [
-    "./pages/**/*.{js,ts,jsx,tsx,mdx}",
-    "./components/**/*.{js,ts,jsx,tsx,mdx}",
-    "./app/**/*.{js,ts,jsx,tsx,mdx}",
-  ],
-  theme: {
-    extend: {
-      fontFamily: {
-        // Akademik başlıklar için Serif (Tırnaklı) font
-        serif: ['var(--font-lora)', 'serif'],
-        // Temiz metinler için Sans font
-        sans: ['Inter', 'sans-serif'],
-      },
-      colors: {
-        // MIT Kırmızısı veya Koyu Antrasit tonları
-        academic: {
-          light: "#fcfcfc", // Kağıt beyazı
-          gray: "#f4f4f4",  // Arka plan grisi
-          dark: "#1a1a1a",  // Ana metin rengi
-          accent: "#A31F34", // MIT kırmızısı (vurgu için)
-        }
+// tailwind.config.ts
+theme: {
+  extend: {
+    colors: {
+      cyber: {
+        black: "#050505",
+        dark: "#0d0d0d",
+        neonPurple: "#bc13fe",
+        neonBlue: "#0ff0fc",
+        neonRed: "#ff073a",
+        border: "#1f1f1f"
       }
     },
-  },
-  plugins: [],
-};
-export default config;
+    boxShadow: {
+      'neon-blue': '0 0 10px #0ff0fc, 0 0 20px #0ff0fc',
+      'neon-purple': '0 0 10px #bc13fe, 0 0 20px #bc13fe',
+    }
+  }
+}
