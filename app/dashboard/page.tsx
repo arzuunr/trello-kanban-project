@@ -46,57 +46,56 @@ export default function Dashboard() {
 
   const colors = ['bg-blue-500','bg-purple-500','bg-green-500','bg-orange-500','bg-pink-500','bg-teal-500']
 
+// app/dashboard/page.tsx
 return (
-  <div className="min-h-screen bg-cyber-black text-cyber-textMain font-mono">
-    <header className="border-b border-cyber-border px-10 py-5 flex justify-between items-center bg-cyber-surface">
+  <div className="min-h-screen bg-[#030303] text-[#e0e0e0] font-mono">
+    {/* Navigasyon: Terminal Header */}
+    <header className="border-b border-[#1a1a1a] px-10 py-5 flex justify-between items-center bg-[#0a0a0a]">
       <div className="flex items-center gap-3">
-        <div className="w-3 h-3 bg-cyber-neonBlue shadow-[0_0_8px_#00f3ff]" />
-        <h1 className="text-xl font-black tracking-tighter">TASK_FLOW_v1.0</h1>
+        <div className="w-2 h-2 bg-[#00f3ff] animate-pulse" />
+        <h1 className="text-lg font-black tracking-tighter">PROJECT_CONSOLE_v1</h1>
       </div>
-      <div className="flex items-center gap-6">
-        <span className="text-[10px] text-gray-500 font-bold tracking-widest uppercase">ID: {userEmail}</span>
-        <button onClick={async () => { await supabase.auth.signOut(); router.push('/login') }}
-          className="text-[10px] border border-cyber-neonPurple px-4 py-2 hover:bg-cyber-neonPurple hover:text-white transition-all">
-          TERMINATE_SESSION
-        </button>
-      </div>
+      <span className="text-[9px] text-gray-600 font-bold tracking-[0.3em] uppercase">{userEmail}</span>
     </header>
 
-    <main className="max-w-7xl mx-auto p-12">
-      <div className="mb-12">
-        <h2 className="text-4xl font-black text-white italic lowercase tracking-tighter">/dashboard</h2>
-        <p className="text-cyber-neonBlue text-xs mt-2 opacity-80">{`> SYSTEM_STATUS: READY // ALL_MODULES_FUNCTIONAL`}</p>
+    <main className="max-w-6xl mx-auto p-12">
+      <div className="mb-16 border-l-2 border-[#9d00ff] pl-6">
+        <h2 className="text-5xl font-black text-white lowercase tracking-tighter italic">/root/projects</h2>
+        <p className="text-[#00f3ff] text-[10px] mt-2 opacity-70 tracking-widest">{`> SYSTEM_STATUS: STABLE // DIRECTORY_LOADED`}</p>
       </div>
 
-      {/* New Project Input: Kod satırı gibi */}
-      <div className="bg-cyber-surface border border-cyber-border p-8 mb-12 shadow-xl">
-        <div className="flex gap-4">
-          <div className="flex-1 relative">
-            <span className="absolute left-0 top-3 text-cyber-neonPurple text-lg font-bold">$</span>
-            <input type="text" placeholder="NEW_PROJECT_NAME..." value={newTitle}
-              onChange={(e) => setNewTitle(e.target.value)}
-              className="w-full bg-transparent border-none pl-6 text-xl text-cyber-neonBlue placeholder:text-gray-800 focus:outline-none focus:ring-0"
-            />
-          </div>
-          <button onClick={createBoard} className="bg-cyber-neonBlue text-black px-10 py-3 font-black uppercase text-xs hover:bg-white transition-all">
-            INIT_PROJECT
-          </button>
-        </div>
+      {/* Input Alanı: Komut Satırı Tarzı */}
+      <div className="bg-[#0a0a0a] border border-[#1a1a1a] p-1 mb-16 flex items-center shadow-2xl">
+        <span className="px-6 text-[#9d00ff] font-bold">$</span>
+        <input 
+          type="text" 
+          placeholder="NEW_PROJECT_UUID..." 
+          value={newTitle}
+          onChange={(e) => setNewTitle(e.target.value)}
+          className="flex-1 bg-transparent border-none py-4 text-[#00f3ff] placeholder:text-gray-800 focus:outline-none font-bold"
+        />
+        <button onClick={createBoard} className="bg-[#00f3ff] text-black px-8 py-4 font-black text-[10px] uppercase hover:bg-white transition-all">
+          DEPLOY_MODULE
+        </button>
       </div>
 
-      {/* Project Grid: Hacker Tarzı ama Temiz */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {/* Proje Kartları: Mühendislik Dosyası Görünümü */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {boards.map((board) => (
-          <div key={board.id} onClick={() => router.push(`/board/${board.id}`)}
-            className="group bg-cyber-surface border border-cyber-border p-8 hover:border-cyber-neonPurple transition-all cursor-pointer relative overflow-hidden"
+          <div 
+            key={board.id} 
+            onClick={() => router.push(`/board/${board.id}`)}
+            className="group bg-[#0a0a0a] border border-[#1a1a1a] p-8 hover:border-[#00f3ff] transition-all cursor-pointer relative overflow-hidden"
           >
-            <div className="flex justify-between items-start mb-6">
-              <h3 className="text-2xl font-bold text-white group-hover:text-cyber-neonPurple transition-colors tracking-tighter capitalize">{board.title}</h3>
-              <button onClick={(e) => deleteBoard(board.id, e)} className="text-gray-700 hover:text-red-500">_DEL</button>
+            <div className="flex justify-between items-start mb-10">
+              <h3 className="text-2xl font-bold text-white group-hover:text-[#00f3ff] transition-colors tracking-tighter uppercase leading-none">
+                {board.title}
+              </h3>
+              <button onClick={(e) => deleteBoard(board.id, e)} className="text-gray-800 hover:text-red-600 font-bold text-[10px]">_PURGE</button>
             </div>
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest italic">Created:</span>
-              <span className="text-[10px] text-cyber-neonBlue font-mono">{new Date(board.created_at).toLocaleDateString()}</span>
+            <div className="flex items-center justify-between text-[9px] font-bold tracking-widest text-gray-600">
+              <span>CREATED_AT: {new Date(board.created_at).toLocaleDateString()}</span>
+              <span className="text-[#9d00ff]">VER: 0.1</span>
             </div>
           </div>
         ))}
