@@ -92,42 +92,33 @@ export default function CardItem({ card, isDragging = false, onUpdate, onDelete 
     )
   }
 
-  // Normal Görünüm (Cyberpunk Card)
-  return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      {...attributes}
-      {...listeners}
-      onDoubleClick={() => setIsEditing(true)}
-      className={`
-        bg-cyber-dark p-4 border border-cyber-border transition-all cursor-grab active:cursor-grabbing group 
-        hover:border-cyber-neonBlue hover:shadow-neon-blue relative
-        ${isDragging ? 'shadow-neon-purple border-cyber-neonPurple rotate-1 scale-105 opacity-90' : ''}
-      `}
-    >
-      {/* Kartın köşesindeki neon detay */}
-      <div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-cyber-neonBlue opacity-0 group-hover:opacity-100 transition-opacity" />
-      
-      <h4 className="text-sm font-mono font-bold text-gray-200 leading-tight mb-2 group-hover:text-cyber-neonBlue transition-colors">
-        <span className="text-cyber-neonPurple mr-2 tracking-tighter">ID:</span>
-        {card.title}
-      </h4>
-      
-      {card.description && (
-        <p className="text-[11px] text-gray-500 font-mono leading-relaxed line-clamp-3 mb-3 border-l border-cyber-border pl-2">
-          {card.description}
-        </p>
-      )}
-
-      <div className="flex justify-between items-center mt-auto pt-3 border-t border-cyber-border/50">
-        <span className="text-[9px] font-mono text-gray-600">
-          SEC_LEVEL: 04
-        </span>
-        <span className="text-[9px] font-mono text-cyber-neonPurple group-hover:animate-pulse">
-          ACCESS_TERMINAL {">"}
-        </span>
-      </div>
+  // CardItem.tsx içindeki Normal Görünüm return'ü:
+return (
+  <div ref={setNodeRef} style={style} {...attributes} {...listeners}
+    onDoubleClick={() => setIsEditing(true)}
+    className={`bg-cyber-surface p-5 border border-cyber-border hover:border-cyber-neonBlue transition-all cursor-grab active:cursor-grabbing group
+    ${isDragging ? 'shadow-neon-blue border-cyber-neonBlue opacity-90 scale-105' : ''}`}
+  >
+    <div className="flex items-center gap-2 mb-3">
+      <div className="w-1.5 h-1.5 bg-cyber-neonPurple group-hover:bg-cyber-neonBlue transition-colors" />
+      <span className="text-[9px] font-bold text-gray-500 uppercase tracking-widest">Entry_{card.id.slice(0,4)}</span>
     </div>
-  )
+
+    {/* Okunabilir başlık ve metin */}
+    <h4 className="text-lg font-bold text-white group-hover:text-cyber-neonBlue transition-colors leading-tight mb-3">
+      {card.title}
+    </h4>
+    
+    {card.description && (
+      <p className="text-xs text-gray-400 font-mono leading-relaxed mb-4 line-clamp-3">
+        {card.description}
+      </p>
+    )}
+
+    <div className="flex justify-between items-center pt-3 border-t border-cyber-border opacity-50 group-hover:opacity-100 transition-opacity">
+      <span className="text-[9px] font-mono text-cyber-neonPurple tracking-tighter uppercase font-bold tracking-widest">Access_Log_04</span>
+      <span className="text-[9px] font-mono text-white animate-pulse">EDIT_DATA {">"}</span>
+    </div>
+  </div>
+)
 }
