@@ -86,39 +86,44 @@ export default function KanbanBoard({ initialColumns, boardId }: Props) {
   }
 
   const handleDragEnd = async (event: DragEndEvent) => {
-    const { active, over } = event
-    setActiveCard(null)
-    setActiveColumn(null)
-    if (!over) return
+  const { active, over } = event;
+  setActiveCard(null);
+  setActiveColumn(null);
+  if (!over) return;
 
-    // Sütun sıralaması
-    if (active.data.current?.type === 'Column' && over.data.current?.type === 'Column') {
-      setColumns(cols => {
-        const aIdx = cols.findIndex(c => c.id === active.id)
-        const oIdx = cols.findIndex(c => c.id === over.id)
-        const newCols = arrayMove(cols, aIdx, oIdx)
-        newCols.forEach((col, idx) => {
-          supabase.from('columns').update({ position: idx + 1 }).eq('id', col.id)
-        })
-        return newCols
-      })
-      return
+  // 1. Sütun Sıralamasını Kaydet
+  if (active.data.current?.type === 'Column') {
+    const aIdx = columns.findIndex(c => c.id === active.id);
+    const oIdx = columns.findIndex(c => c.id === over.id);
+    if (aIdx !== oIdx) {
+      const newCols = arrayMove(columns, aIdx, oIdx);
+      setColumns(newCols);
+      // Veritabanında tüm sütun pozisyonlarını güncelle
+      newCols.forEach((col, idx) => {
+        supabase.from('columns').update({ position: idx + 1 }).eq('id', col.id).then();
+      });
     }
-
-    // Kart pozisyonlarını kaydet
-    if (active.data.current?.type === 'Card') {
-      setColumns(cols => {
-        cols.forEach(col => {
-          col.cards.forEach((card, idx) => {
-            if (card.id === active.id) {
-              supabase.from('cards').update({ column_id: card.column_id, position: idx + 1 }).eq('id', card.id)
-            }
-          })
-        })
-        return cols
-      })
-    }
+    return;
   }
+
+  // 2. Kart Sıralamasını ve Sütununu Kaydet
+  if (active.data.current?.type === 'Card') {
+    // Sürükleme bittiğinde tüm sütunlardaki tüm kartların pozisyonlarını veritabanına yazıyoruz
+    columns.forEach((col) => {
+      col.cards.forEach((card, idx) => {
+        // Kartın hem hangi sütunda olduğunu hem de o sütundaki sırasını kaydediyoruz
+        supabase
+          .from('cards')
+          .update({ 
+            column_id: col.id, // Kartın içinde bulunduğu güncel sütun
+            position: idx + 1  // Kartın o sütundaki güncel sırası
+          })
+          .eq('id', card.id)
+          .then();
+      })
+    })
+  }
+}
 
   const addColumn = async () => {
     if (!newColTitle.trim()) return
