@@ -23,9 +23,13 @@ export default function CardItem({ card, isDragging = false, onUpdate, onDelete 
 
   if (isSortableDragging) {
     return (
-      <div ref={setNodeRef} style={dndStyle}
+      <div ref={setNodeRef} 
+        style={{ 
+          ...dndStyle, 
+          borderColor: 'rgba(192,132,252,0.4)', 
+          background: 'rgba(192,132,252,0.05)' 
+        }}
         className="rounded-xl min-h-16 border border-dashed opacity-60"
-        style={{ borderColor: 'rgba(192,132,252,0.4)', background: 'rgba(192,132,252,0.05)' }}
       />
     )
   }
