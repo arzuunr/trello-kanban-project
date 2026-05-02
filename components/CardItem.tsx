@@ -56,7 +56,7 @@ export default function CardItem({ card, isDragging = false, onUpdate, onDelete 
       onDoubleClick={() => setIsEditing(true)}
       className={`group bg-surface border border-border rounded-xl p-3 cursor-grab active:cursor-grabbing transition-all hover:border-accent/40
         ${isDragging ? 'rotate-2 scale-105 border-accent/60' : ''}`}
-      style={isDragging ? { boxShadow: '0 10px 40px rgba(192,132,252,0.3)' } : {}}>
+      style={isDragging ? { boxShadow: '0 10px 40px rgba(192,132,252,0.3)' } : undefined}>
       <p className="text-sm font-medium text-textMain group-hover:text-accent transition-colors leading-snug">
         {card.title}
       </p>
