@@ -1,44 +1,40 @@
-# TaskFlow — Kanban Proje Yönetim Tahtası
+# TaskFlow: Modern ve Fütüristik Kanban Yönetim Sistemi
 
-## Kurulum
+## Proje Hakkında
+Ben Arzu, İstanbul Teknik Üniversitesi'nde Fizik Mühendisliği son sınıf öğrencisi ve aynı zamanda Bilyoner bünyesinde Data Scientist olarak görev yapmaktayım. Teknik geçmişimi ve veri bilimi projelerimdeki süreç yönetim ihtiyacımı birleştirerek, estetik ile fonksiyonelliği harmanlayan TaskFlow projesini hayata geçirdim. TaskFlow; Next.js 14, Supabase ve dnd-kit teknolojilerini kullanarak, iş akışlarını fütüristik bir kullanıcı deneyimi ile modernize etmeyi amaçlayan bir SaaS platformudur.
 
-### 1. Bağımlılıkları Yükle
-```bash
-npm install
-```
+## Temel Özellikler
+*   **Modern SaaS Arayüzü:** Derin siyah ve mor tonların hakim olduğu, minimalist ve profesyonel bir görsel dil benimsenmiştir.
+*   **Gelişmiş Sürükle ve Bırak:** dnd-kit kütüphanesi kullanılarak hem sütunlar hem de kartlar bazında akıcı bir sıralama mekanizması kurulmuştur.
+*   **Klavye Odaklı Kullanıcı Deneyimi:** Yeni sütun veya görev ekleme süreçlerinde fare kullanımına gerek kalmadan, Enter tuşu ile onaylama ve Escape tuşu ile iptal işlemleri gerçekleştirilebilir.
+*   **Veri Kalıcılığı ve Senkronizasyon:** Supabase PostgreSQL entegrasyonu sayesinde her bir sürükleme hareketi ve içerik değişikliği veritabanı seviyesinde eş zamanlı olarak korunur.
+*   **Dinamik Sıralama Sistemi:** Projeler ve görevler, veritabanındaki pozisyon değerlerine göre akıllıca sıralanır ve her oturumda aynı düzende sunulur.
 
-### 2. .env.local Dosyasını Doldur
-Supabase Dashboard → Settings → API bölümünden alacağın değerleri `.env.local` dosyasına gir:
-```
-NEXT_PUBLIC_SUPABASE_URL=https://xxxxx.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGci...
-```
+## Kullanılan Teknolojiler
+*   **Frontend:** Next.js 14 (App Router)
+*   **Backend:** Supabase (PostgreSQL, Auth ve Row Level Security)
+*   **Sürükle-Bırak Mantığı:** @dnd-kit/core ve @dnd-kit/sortable
+*   **Dil:** TypeScript
+*   **Dağıtım:** Vercel
 
-### 3. Supabase SQL Editor'de Tabloları Oluştur
-Supabase → SQL Editor'e git, `supabase-schema.sql` dosyasının içeriğini yapıştır ve çalıştır.
+## Kurulum ve Çalıştırma
+Projeyi yerel ortamınızda ayağa kaldırmak için aşağıdaki adımları takip edebilirsiniz:
 
-### 4. Geliştirme Sunucusunu Başlat
-```bash
-npm run dev
-```
-Tarayıcıda http://localhost:3000 aç.
-
-## Vercel Deploy
-
-```bash
-npm install -g vercel
-vercel
-vercel --prod
-```
-
-Vercel Dashboard → Settings → Environment Variables bölümüne `.env.local` değerlerini ekle.
-
-## Özellikler
-
-- Kullanıcı kaydı ve girişi
-- Birden fazla tahta oluşturma
-- Sütun oluşturma ve yönetme
-- Kart ekleme, düzenleme, silme
-- Sürükle-bırak ile kart ve sütun sıralama
-- Sayfa yenilemesinde sıralama korunur
-- Mobil uyumlu tasarım
+1.  **Depoyu Klonlayın:**
+    ```bash
+    git clone https://github.com/arzuunr/trello-kanban-project.git
+    ```
+2.  **Bağımlılıkları Yükleyin:**
+    ```bash
+    npm install
+    ```
+3.  **Çevre Değişkenlerini Ayarlayın:**
+    `.env.local` dosyası oluşturarak Supabase bağlantı bilgilerinizi tanımlayın:
+    ```env
+    NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+    NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_key
+    ```
+4.  **Uygulamayı Başlatın:**
+    ```bash
+    npm run dev
+    ```
