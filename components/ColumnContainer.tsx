@@ -46,10 +46,8 @@ export default function ColumnContainer({ column, onCardAdd, onCardUpdate, onCar
       ref={setNodeRef}
       style={{ ...dndStyle, width: '272px', maxHeight: 'calc(100vh - 80px)', background: '#130f22', border: '1px solid #2a1f45', borderRadius: '16px', flexShrink: 0, display: 'flex', flexDirection: 'column' }}
     >
-      {/* Gradient bar */}
       <div style={{ height: '2px', background: gradient, borderRadius: '16px 16px 0 0' }} />
 
-      {/* Header */}
       <div {...attributes} {...listeners} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', cursor: 'grab', userSelect: 'none' }}>
         {isEditingTitle ? (
           <input
@@ -84,7 +82,6 @@ export default function ColumnContainer({ column, onCardAdd, onCardUpdate, onCar
         </div>
       </div>
 
-      {/* Cards */}
       <div style={{ flex: 1, overflowY: 'auto', padding: '0 12px 8px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
         <SortableContext items={column.cards.map(c => c.id)} strategy={verticalListSortingStrategy}>
           {column.cards.map(card => (
@@ -103,7 +100,6 @@ export default function ColumnContainer({ column, onCardAdd, onCardUpdate, onCar
         )}
       </div>
 
-      {/* Add card */}
       <div style={{ padding: '12px', borderTop: '1px solid rgba(42,31,69,0.6)' }}>
         {isAdding ? (
           <>
@@ -114,14 +110,24 @@ export default function ColumnContainer({ column, onCardAdd, onCardUpdate, onCar
               value={newCardTitle}
               onChange={(e) => setNewCardTitle(e.target.value)}
               onKeyDown={async (e) => {
-                if (e.key === 'Enter' && newCardTitle.trim()) { await onCardAdd(newCardTitle.trim()); setNewCardTitle(''); setIsAdding(false) }
-                if (e.key === 'Escape') { setNewCardTitle(''); setIsAdding(false) }
+                // Enter basıldığında hemen UI'ı temizle ve veriyi gönder
+                if (e.key === 'Enter' && newCardTitle.trim()) {
+                  e.preventDefault();
+                  const titleToAdd = newCardTitle.trim();
+                  setNewCardTitle(''); 
+                  setIsAdding(false);  
+                  await onCardAdd(titleToAdd);
+                }
+                if (e.key === 'Escape') { 
+                  setNewCardTitle(''); 
+                  setIsAdding(false); 
+                }
               }}
               style={{ width: '100%', background: '#06040f', border: '1px solid #2a1f45', borderRadius: '12px', padding: '10px 12px', fontSize: '14px', color: '#f1eeff', outline: 'none', marginBottom: '8px', display: 'block' }}
             />
             <div style={{ display: 'flex', gap: '8px' }}>
               <button
-                onClick={async () => { if (newCardTitle.trim()) { await onCardAdd(newCardTitle.trim()); setNewCardTitle(''); setIsAdding(false) } }}
+                onClick={async () => { if (newCardTitle.trim()) { const title = newCardTitle.trim(); setNewCardTitle(''); setIsAdding(false); await onCardAdd(title); } }}
                 style={{ background: 'linear-gradient(135deg, #c084fc, #f472b6)', color: '#06040f', border: 'none', borderRadius: '12px', padding: '8px 16px', fontSize: '12px', fontWeight: 600, cursor: 'pointer' }}
               >Ekle</button>
               <button
