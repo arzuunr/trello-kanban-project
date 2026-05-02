@@ -32,34 +32,25 @@ export default function ColumnContainer({ column, onCardAdd, onCardUpdate, onCar
   const { setNodeRef, attributes, listeners, transform, transition, isDragging } =
     useSortable({ id: column.id, data: { type: 'Column', column } })
 
-  const style = { transform: CSS.Transform.toString(transform), transition }
+  const dndStyle = { transform: CSS.Transform.toString(transform), transition }
   const gradient = GRADIENTS[parseInt(column.id.slice(-1), 16) % GRADIENTS.length]
 
   if (isDragging) {
     return (
-      <div
-        ref={setNodeRef}
-        style={{ ...style, width: '272px' }}
-        className="bg-panel/50 border border-dashed border-accent/30 rounded-2xl min-h-32 opacity-40 flex-shrink-0"
-      />
+      <div ref={setNodeRef} style={{ ...dndStyle, width: '272px', minHeight: '120px', opacity: 0.4, border: '2px dashed rgba(192,132,252,0.3)', borderRadius: '16px', background: 'rgba(19,15,34,0.5)', flexShrink: 0 }} />
     )
   }
 
   return (
     <div
       ref={setNodeRef}
-      style={{ ...style, width: '272px', maxHeight: 'calc(100vh - 80px)' }}
-      className="bg-panel/80 backdrop-blur border border-border rounded-2xl flex-shrink-0 flex flex-col"
+      style={{ ...dndStyle, width: '272px', maxHeight: 'calc(100vh - 80px)', background: '#130f22', border: '1px solid #2a1f45', borderRadius: '16px', flexShrink: 0, display: 'flex', flexDirection: 'column' }}
     >
-      {/* Top gradient bar */}
-      <div className="h-0.5 rounded-t-2xl w-full" style={{ background: gradient }} />
+      {/* Gradient bar */}
+      <div style={{ height: '2px', background: gradient, borderRadius: '16px 16px 0 0' }} />
 
       {/* Header */}
-      <div
-        {...attributes}
-        {...listeners}
-        className="flex items-center justify-between px-4 py-3 cursor-grab active:cursor-grabbing select-none"
-      >
+      <div {...attributes} {...listeners} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', cursor: 'grab', userSelect: 'none' }}>
         {isEditingTitle ? (
           <input
             autoFocus
@@ -71,30 +62,30 @@ export default function ColumnContainer({ column, onCardAdd, onCardUpdate, onCar
               if (e.key === 'Escape') { setColumnTitle(column.title); setIsEditingTitle(false) }
             }}
             onPointerDown={(e) => e.stopPropagation()}
-            className="bg-void border border-accent/40 rounded-lg px-2 py-1 text-sm text-textMain w-full mr-2 focus:outline-none"
+            style={{ flex: 1, background: '#06040f', border: '1px solid rgba(192,132,252,0.4)', borderRadius: '8px', padding: '4px 8px', fontSize: '13px', color: '#f1eeff', outline: 'none', marginRight: '8px' }}
           />
         ) : (
           <h3
             onDoubleClick={(e) => { e.stopPropagation(); setIsEditingTitle(true) }}
-            className="text-sm font-semibold text-textMain flex-1 truncate"
+            style={{ fontSize: '13px', fontWeight: 600, color: '#f1eeff', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
           >
             {column.title}
           </h3>
         )}
-        <div className="flex items-center gap-2 ml-2">
-          <span className="text-xs text-muted bg-void/60 border border-border px-2 py-0.5 rounded-full">
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginLeft: '8px' }}>
+          <span style={{ fontSize: '11px', color: '#4a3a6a', background: 'rgba(6,4,15,0.6)', border: '1px solid #2a1f45', padding: '2px 8px', borderRadius: '999px' }}>
             {column.cards.length}
           </span>
           <button
             onPointerDown={(e) => e.stopPropagation()}
             onClick={() => { if (confirm(`"${column.title}" sütununu sil?`)) onColumnDelete() }}
-            className="text-muted hover:text-red-400 text-xl leading-none transition-colors"
+            style={{ background: 'none', border: 'none', color: '#4a3a6a', fontSize: '20px', lineHeight: 1, cursor: 'pointer', padding: '0 2px' }}
           >×</button>
         </div>
       </div>
 
       {/* Cards */}
-      <div className="flex-1 overflow-y-auto px-3 pb-2 flex flex-col gap-2">
+      <div style={{ flex: 1, overflowY: 'auto', padding: '0 12px 8px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
         <SortableContext items={column.cards.map(c => c.id)} strategy={verticalListSortingStrategy}>
           {column.cards.map(card => (
             <CardItem
@@ -106,14 +97,14 @@ export default function ColumnContainer({ column, onCardAdd, onCardUpdate, onCar
           ))}
         </SortableContext>
         {column.cards.length === 0 && !isAdding && (
-          <div className="border border-dashed border-border/50 rounded-xl h-16 flex items-center justify-center">
-            <span className="text-xs text-muted">Kart yok</span>
+          <div style={{ border: '1px dashed rgba(42,31,69,0.5)', borderRadius: '12px', height: '64px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <span style={{ fontSize: '12px', color: '#4a3a6a' }}>Kart yok</span>
           </div>
         )}
       </div>
 
       {/* Add card */}
-      <div className="p-3 border-t border-border/60">
+      <div style={{ padding: '12px', borderTop: '1px solid rgba(42,31,69,0.6)' }}>
         {isAdding ? (
           <>
             <input
@@ -123,44 +114,27 @@ export default function ColumnContainer({ column, onCardAdd, onCardUpdate, onCar
               value={newCardTitle}
               onChange={(e) => setNewCardTitle(e.target.value)}
               onKeyDown={async (e) => {
-                if (e.key === 'Enter' && newCardTitle.trim()) {
-                  await onCardAdd(newCardTitle.trim())
-                  setNewCardTitle('')
-                  setIsAdding(false)
-                }
+                if (e.key === 'Enter' && newCardTitle.trim()) { await onCardAdd(newCardTitle.trim()); setNewCardTitle(''); setIsAdding(false) }
                 if (e.key === 'Escape') { setNewCardTitle(''); setIsAdding(false) }
               }}
-              className="w-full bg-void border border-border rounded-xl px-3 py-2.5 text-sm text-textMain placeholder-muted focus:outline-none focus:border-accent transition-colors mb-2"
+              style={{ width: '100%', background: '#06040f', border: '1px solid #2a1f45', borderRadius: '12px', padding: '10px 12px', fontSize: '14px', color: '#f1eeff', outline: 'none', marginBottom: '8px', display: 'block' }}
             />
-            <div className="flex gap-2">
+            <div style={{ display: 'flex', gap: '8px' }}>
               <button
-                onClick={async () => {
-                  if (newCardTitle.trim()) {
-                    await onCardAdd(newCardTitle.trim())
-                    setNewCardTitle('')
-                    setIsAdding(false)
-                  }
-                }}
-                className="text-xs font-semibold px-4 py-2 rounded-xl transition-all"
-                style={{ background: 'linear-gradient(135deg, #c084fc, #f472b6)', color: '#06040f' }}
-              >
-                Ekle
-              </button>
+                onClick={async () => { if (newCardTitle.trim()) { await onCardAdd(newCardTitle.trim()); setNewCardTitle(''); setIsAdding(false) } }}
+                style={{ background: 'linear-gradient(135deg, #c084fc, #f472b6)', color: '#06040f', border: 'none', borderRadius: '12px', padding: '8px 16px', fontSize: '12px', fontWeight: 600, cursor: 'pointer' }}
+              >Ekle</button>
               <button
                 onClick={() => { setNewCardTitle(''); setIsAdding(false) }}
-                className="text-xs text-textDim px-3 py-2 rounded-xl hover:bg-void transition-colors"
-              >
-                İptal
-              </button>
+                style={{ background: 'transparent', color: '#9985c8', border: 'none', borderRadius: '12px', padding: '8px 12px', fontSize: '12px', cursor: 'pointer' }}
+              >İptal</button>
             </div>
           </>
         ) : (
           <button
             onClick={() => setIsAdding(true)}
-            className="w-full text-sm text-textDim hover:text-accent py-2 rounded-xl hover:bg-void/60 transition-colors"
-          >
-            + Kart Ekle
-          </button>
+            style={{ width: '100%', background: 'transparent', border: 'none', color: '#9985c8', fontSize: '14px', padding: '8px', borderRadius: '12px', cursor: 'pointer' }}
+          >+ Kart Ekle</button>
         )}
       </div>
     </div>
