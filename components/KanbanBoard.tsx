@@ -4,8 +4,8 @@ import {
   DndContext, DragOverlay, PointerSensor, TouchSensor, 
   useSensor, useSensors, DragStartEvent, DragEndEvent, DragOverEvent, 
   closestCorners 
-} from '@dnd-kit/core'
-import { SortableContext, horizontalListSortingStrategy, arrayMove } from '@dnd-kit/sortable'
+} from '@nd-kit/core'
+import { SortableContext, horizontalListSortingStrategy, arrayMove } from '@nd-kit/sortable'
 import { supabase } from '@/lib/supabase'
 import ColumnContainer from './ColumnContainer'
 import CardItem from './CardItem'
@@ -70,7 +70,6 @@ export default function KanbanBoard({ initialColumns, boardId }: { initialColumn
     setActiveCard(null); setActiveColumn(null)
     if (!over) return
 
-    // Sütun Sıralama
     if (active.data.current?.type === 'Column' && active.id !== over.id) {
       const oldIdx = columns.findIndex(c => c.id === active.id)
       const newIdx = columns.findIndex(c => c.id === over.id)
@@ -81,7 +80,6 @@ export default function KanbanBoard({ initialColumns, boardId }: { initialColumn
       })
     }
 
-    // Kart Sıralama Senkronizasyonu
     if (active.data.current?.type === 'Card') {
       columns.forEach(col => {
         col.cards.forEach((card, idx) => {
@@ -132,8 +130,33 @@ export default function KanbanBoard({ initialColumns, boardId }: { initialColumn
             <span style={{ color: '#c084fc', fontFamily: 'monospace', fontSize: '11px', fontWeight: 'bold', letterSpacing: '0.1em' }}>
               [ YENİ SÜTUN TANIMLA ]
             </span>
-            <input value={newColTitle} onChange={(e) => setNewColTitle(e.target.value)} placeholder="Sütun Adı..." style={{ width: '100%', background: '#06040f', border: '1px solid #2a1f45', borderRadius: '8px', padding: '10px', color: 'white', outline: 'none', fontSize: '13px' }} />
-            <button onClick={addColumn} style={{ width: '100%', background: 'linear-gradient(135deg, #c084fc, #f472b6)', border: 'none', borderRadius: '8px', padding: '10px', fontWeight: 'bold', cursor: 'pointer', color: '#06040f' }}>+ Sütun Ekle</button>
+            <input 
+              value={newColTitle} 
+              onChange={(e) => setNewColTitle(e.target.value)} 
+              onKeyDown={async (e) => {
+                if (e.key === 'Enter' && newColTitle.trim()) {
+                  e.preventDefault();
+                  await addColumn();
+                }
+                if (e.key === 'Escape') {
+                  setNewColTitle('');
+                }
+              }}
+              placeholder="Sütun Adı..." 
+              style={{ 
+                width: '100%', 
+                background: '#06040f', 
+                border: '1px solid #2a1f45', 
+                borderRadius: '8px', 
+                padding: '10px', 
+                color: 'white', 
+                outline: 'none', 
+                fontSize: '13px' 
+              }} 
+            />
+            <button onClick={addColumn} style={{ width: '100%', background: 'linear-gradient(135deg, #c084fc, #f472b6)', border: 'none', borderRadius: '8px', padding: '10px', fontWeight: 'bold', cursor: 'pointer', color: '#06040f' }}>
+              + Sütun Ekle
+            </button>
           </div>
         </div>
       </div>
