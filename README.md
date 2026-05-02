@@ -1,5 +1,7 @@
 # TaskFlow: Modern ve Fütüristik Kanban Yönetim Sistemi
 
+https://trello-kanban-project-llcx-eoekjcu5c-arzuunrs-projects.vercel.app?_vercel_share=FLrjmNZ0OGQQ4uhOiOg3RVBMRRYh6X6P
+
 ## Proje Hakkında
 TaskFlow; Next.js 14, Supabase ve dnd-kit teknolojilerini kullanarak, iş akışlarını fütüristik bir kullanıcı deneyimi ile modernize etmeyi amaçlayan bir SaaS platformudur.
 
