@@ -1,7 +1,7 @@
 # TaskFlow: Modern ve Fütüristik Kanban Yönetim Sistemi
 
 ## Proje Hakkında
-Ben Arzu, İstanbul Teknik Üniversitesi'nde Fizik Mühendisliği son sınıf öğrencisi ve aynı zamanda Bilyoner bünyesinde Data Scientist olarak görev yapmaktayım. Teknik geçmişimi ve veri bilimi projelerimdeki süreç yönetim ihtiyacımı birleştirerek, estetik ile fonksiyonelliği harmanlayan TaskFlow projesini hayata geçirdim. TaskFlow; Next.js 14, Supabase ve dnd-kit teknolojilerini kullanarak, iş akışlarını fütüristik bir kullanıcı deneyimi ile modernize etmeyi amaçlayan bir SaaS platformudur.
+TaskFlow; Next.js 14, Supabase ve dnd-kit teknolojilerini kullanarak, iş akışlarını fütüristik bir kullanıcı deneyimi ile modernize etmeyi amaçlayan bir SaaS platformudur.
 
 ## Temel Özellikler
 *   **Modern SaaS Arayüzü:** Derin siyah ve mor tonların hakim olduğu, minimalist ve profesyonel bir görsel dil benimsenmiştir.
