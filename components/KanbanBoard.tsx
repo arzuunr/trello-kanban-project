@@ -36,16 +36,15 @@ export default function KanbanBoard({ initialColumns, boardId }: Props) {
   const [activeColumn, setActiveColumn] = useState<ColumnType | null>(null)
   const [newColTitle, setNewColTitle] = useState('')
 
-  // KanbanBoard.tsx içinde sensörleri güncelle:
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 0.1, // Neredeyse hiç mesafe bekleme (anında sürükle)
+        distance: 0.1,
       },
     }),
     useSensor(TouchSensor, {
       activationConstraint: {
-        delay: 50, // Dokunma için minimum gecikme
+        delay: 50,
         tolerance: 5,
       },
     })
@@ -142,8 +141,15 @@ export default function KanbanBoard({ initialColumns, boardId }: Props) {
       onDragEnd={handleDragEnd}
     >
       <div 
-        className="flex gap-4 p-8 overflow-x-auto items-start bg-cyber-black" 
-        style={{ minHeight: 'calc(100vh - 80px)' }}
+        style={{ 
+          display: 'flex', 
+          gap: '16px', 
+          padding: '32px', 
+          overflowX: 'auto', 
+          alignItems: 'flex-start', 
+          background: '#06040f', // globals.css ile aynı derin siyah
+          minHeight: 'calc(100vh - 80px)' 
+        }}
       >
         <SortableContext items={columns.map(c => c.id)} strategy={horizontalListSortingStrategy}>
           {columns.map(column => (
@@ -186,10 +192,23 @@ export default function KanbanBoard({ initialColumns, boardId }: Props) {
           ))}
         </SortableContext>
 
-        {/* Add Section - Terminal Style */}
-        <div className="flex-shrink-0 w-80">
-          <div className="border border-cyber-border bg-cyber-dark p-6 shadow-[0_0_15px_rgba(15,240,252,0.1)]">
-            <h3 className="text-cyber-neonPurple font-mono text-[10px] uppercase mb-4 tracking-[0.2em]">
+        {/* Add Section - Terminal Style but with Inline Styles */}
+        <div style={{ flexShrink: 0, width: '320px' }}>
+          <div style={{ 
+            background: '#0e0a1a', 
+            border: '1px solid #2a1f45', 
+            borderRadius: '16px', 
+            padding: '24px',
+            boxShadow: '0 0 20px rgba(192,132,252,0.05)'
+          }}>
+            <h3 style={{ 
+              color: '#c084fc', 
+              fontFamily: 'monospace', 
+              fontSize: '11px', 
+              textTransform: 'uppercase', 
+              marginBottom: '16px', 
+              letterSpacing: '0.2em' 
+            }}>
               {">"} INITIALIZE_SECTION
             </h3>
             <input
@@ -198,11 +217,33 @@ export default function KanbanBoard({ initialColumns, boardId }: Props) {
               value={newColTitle}
               onChange={(e) => setNewColTitle(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && addColumn()}
-              className="w-full bg-black border border-cyber-border rounded-none p-2 mb-4 text-cyber-neonBlue font-mono text-sm focus:outline-none focus:border-cyber-neonBlue transition-colors"
+              style={{ 
+                width: '100%', 
+                background: '#06040f', 
+                border: '1px solid #2a1f45', 
+                borderRadius: '8px', 
+                padding: '8px 12px', 
+                marginBottom: '16px', 
+                color: '#c084fc', 
+                fontFamily: 'monospace', 
+                fontSize: '14px',
+                outline: 'none'
+              }}
             />
             <button
               onClick={addColumn}
-              className="w-full text-[10px] font-mono font-bold uppercase border border-cyber-neonBlue text-cyber-neonBlue px-4 py-2 hover:bg-cyber-neonBlue hover:text-black transition-all shadow-[0_0_10px_rgba(15,240,252,0.3)]"
+              style={{ 
+                width: '100%', 
+                background: 'transparent', 
+                border: '1px solid #c084fc', 
+                color: '#c084fc', 
+                borderRadius: '8px', 
+                padding: '10px', 
+                fontSize: '12px', 
+                fontWeight: 'bold', 
+                cursor: 'pointer',
+                fontFamily: 'monospace'
+              }}
             >
               [ EXECUTE_ADD ]
             </button>
@@ -213,11 +254,30 @@ export default function KanbanBoard({ initialColumns, boardId }: Props) {
       <DragOverlay>
         {activeCard && <CardItem card={activeCard} isDragging />}
         {activeColumn && (
-          <div className="bg-cyber-dark border border-cyber-neonPurple p-8 shadow-neon-purple w-72">
-             <span className="text-[10px] font-mono font-bold uppercase text-cyber-neonPurple animate-pulse italic">
-                RELOCATING_CORE_SECTION...
+          <div style={{ 
+            background: '#0e0a1a', 
+            border: '1px solid #c084fc', 
+            borderRadius: '16px', 
+            padding: '32px', 
+            width: '272px',
+            boxShadow: '0 0 30px rgba(192,132,252,0.2)'
+          }}>
+             <span style={{ 
+               fontSize: '10px', 
+               fontWeight: 'bold', 
+               textTransform: 'uppercase', 
+               color: '#c084fc', 
+               fontFamily: 'monospace' 
+             }}>
+                RELOCATING_SECTION...
              </span>
-             <h3 className="text-white font-mono font-bold text-2xl mt-2 tracking-tighter">
+             <h3 style={{ 
+               color: 'white', 
+               fontFamily: 'monospace', 
+               fontWeight: 'bold', 
+               fontSize: '24px', 
+               marginTop: '8px' 
+             }}>
                 {activeColumn.title}
              </h3>
           </div>
