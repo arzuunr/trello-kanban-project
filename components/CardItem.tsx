@@ -25,7 +25,7 @@ export default function CardItem({ card, isDragging = false, onUpdate, onDelete 
     return (
       <div ref={setNodeRef} style={dndStyle}
         className="rounded-xl min-h-16 border border-dashed opacity-60"
-        style2={{ borderColor: 'rgba(192,132,252,0.4)', background: 'rgba(192,132,252,0.05)' }}
+        style={{ borderColor: 'rgba(192,132,252,0.4)', background: 'rgba(192,132,252,0.05)' }}
       />
     )
   }
