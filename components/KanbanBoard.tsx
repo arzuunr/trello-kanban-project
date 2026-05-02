@@ -19,7 +19,6 @@ export default function KanbanBoard({ initialColumns, boardId }: { initialColumn
   const [activeColumn, setActiveColumn] = useState<ColumnType | null>(null)
   const [newColTitle, setNewColTitle] = useState('')
 
-  // Mobil ve Masaüstü için optimize edilmiş sensörler
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 0.1 } }),
     useSensor(TouchSensor, { activationConstraint: { delay: 100, tolerance: 5 } })
@@ -37,25 +36,32 @@ export default function KanbanBoard({ initialColumns, boardId }: { initialColumn
     const activeId = active.id
     const overId = over.id
 
-    const activeColumn = columns.find(col => col.cards.some(card => card.id === activeId))
-    const overColumn = columns.find(col => col.id === overId || col.cards.some(card => card.id === overId))
-
-    if (!activeColumn || !overColumn || activeColumn === overColumn) return
-
     setColumns(prev => {
-      const activeCards = [...activeColumn.cards]
-      const overCards = [...overColumn.cards]
-      const activeIndex = activeCards.findIndex(c => c.id === activeId)
-      const [movedCard] = activeCards.splice(activeIndex, 1)
+      const newCols = prev.map(c => ({ ...c, cards: [...c.cards] }))
       
-      movedCard.column_id = overColumn.id
-      overCards.push(movedCard)
+      const aColIdx = newCols.findIndex(c => c.cards.some(card => card.id === activeId))
+      const oColIdx = newCols.findIndex(c => c.id === overId || c.cards.some(card => card.id === overId))
 
-      return prev.map(col => {
-        if (col.id === activeColumn.id) return { ...col, cards: activeCards }
-        if (col.id === overColumn.id) return { ...col, cards: overCards }
-        return col
-      })
+      if (aColIdx === -1 || oColIdx === -1) return prev
+
+      const aCardIdx = newCols[aColIdx].cards.findIndex(c => c.id === activeId)
+
+      // AYNI SÜTUN İÇİNDE YER DEĞİŞTİRME
+      if (aColIdx === oColIdx) {
+        const oCardIdx = newCols[oColIdx].cards.findIndex(c => c.id === overId)
+        newCols[aColIdx].cards = arrayMove(newCols[aColIdx].cards, aCardIdx, oCardIdx)
+      } 
+      // SÜTUNLAR ARASI GEÇİŞ
+      else {
+        const [movedCard] = newCols[aColIdx].cards.splice(aCardIdx, 1)
+        movedCard.column_id = newCols[oColIdx].id
+        
+        const oCardIdx = newCols[oColIdx].cards.findIndex(c => c.id === overId)
+        const insertIdx = oCardIdx >= 0 ? oCardIdx : newCols[oColIdx].cards.length
+        newCols[oColIdx].cards.splice(insertIdx, 0, movedCard)
+      }
+
+      return newCols
     })
   }
 
@@ -64,7 +70,7 @@ export default function KanbanBoard({ initialColumns, boardId }: { initialColumn
     setActiveCard(null); setActiveColumn(null)
     if (!over) return
 
-    // Sütun Sıralama Senkronizasyonu
+    // Sütun Sıralama
     if (active.data.current?.type === 'Column' && active.id !== over.id) {
       const oldIdx = columns.findIndex(c => c.id === active.id)
       const newIdx = columns.findIndex(c => c.id === over.id)
@@ -75,7 +81,7 @@ export default function KanbanBoard({ initialColumns, boardId }: { initialColumn
       })
     }
 
-    // Kart Sıralama ve Veritabanı Kaydı
+    // Kart Sıralama Senkronizasyonu
     if (active.data.current?.type === 'Card') {
       columns.forEach(col => {
         col.cards.forEach((card, idx) => {
@@ -121,10 +127,11 @@ export default function KanbanBoard({ initialColumns, boardId }: { initialColumn
           ))}
         </SortableContext>
 
-        {/* Minimalist Add Section */}
         <div style={{ flexShrink: 0, width: '272px' }}>
           <div style={{ background: 'rgba(19, 15, 34, 0.4)', border: '2px dashed #2a1f45', borderRadius: '16px', padding: '24px', display: 'flex', flexDirection: 'column', gap: '12px', minHeight: '140px' }}>
-            <span style={{ color: '#c084fc', fontFamily: 'monospace', fontSize: '11px', fontWeight: 'bold' }}>[ READY_TO_INITIALIZE ]</span>
+            <span style={{ color: '#c084fc', fontFamily: 'monospace', fontSize: '11px', fontWeight: 'bold', letterSpacing: '0.1em' }}>
+              [ YENİ SÜTUN TANIMLA ]
+            </span>
             <input value={newColTitle} onChange={(e) => setNewColTitle(e.target.value)} placeholder="Sütun Adı..." style={{ width: '100%', background: '#06040f', border: '1px solid #2a1f45', borderRadius: '8px', padding: '10px', color: 'white', outline: 'none', fontSize: '13px' }} />
             <button onClick={addColumn} style={{ width: '100%', background: 'linear-gradient(135deg, #c084fc, #f472b6)', border: 'none', borderRadius: '8px', padding: '10px', fontWeight: 'bold', cursor: 'pointer', color: '#06040f' }}>+ Sütun Ekle</button>
           </div>
