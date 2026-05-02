@@ -15,6 +15,14 @@ interface Props {
   onColumnRename: (title: string) => void
 }
 
+const GRADIENTS = [
+  'linear-gradient(135deg, #c084fc, #818cf8)',
+  'linear-gradient(135deg, #f472b6, #c084fc)',
+  'linear-gradient(135deg, #818cf8, #38bdf8)',
+  'linear-gradient(135deg, #34d399, #818cf8)',
+  'linear-gradient(135deg, #fb923c, #f472b6)',
+]
+
 export default function ColumnContainer({ column, onCardAdd, onCardUpdate, onCardDelete, onColumnDelete, onColumnRename }: Props) {
   const [newCardTitle, setNewCardTitle] = useState('')
   const [isAdding, setIsAdding] = useState(false)
@@ -25,99 +33,89 @@ export default function ColumnContainer({ column, onCardAdd, onCardUpdate, onCar
     useSortable({ id: column.id, data: { type: 'Column', column } })
 
   const style = { transform: CSS.Transform.toString(transform), transition }
+  const gradient = GRADIENTS[parseInt(column.id.slice(-1), 16) % GRADIENTS.length]
 
- if (isDragging) {
-    return <div ref={setNodeRef} style={style} className="bg-academic-gray border border-dashed border-gray-300 rounded-none w-72 min-h-[500px] opacity-40 flex-shrink-0" />
+  if (isDragging) {
+    return <div ref={setNodeRef} style={style}
+      className="bg-panel/50 border border-dashed border-accent/30 rounded-2xl w-68 min-h-32 opacity-40 flex-shrink-0" style={{ width: '272px', ...style }} />
   }
 
   return (
-    <div 
-      ref={setNodeRef} 
-      className="bg-transparent w-72 flex-shrink-0 flex flex-col border-r border-gray-100 px-2" 
-      style={{ maxHeight: 'calc(100vh - 120px)', ...style }}
-    >
-      {/* Header - Teknik ve Minimal */}
-      <div {...attributes} {...listeners} className="flex items-center justify-between p-4 cursor-grab active:cursor-grabbing select-none group">
+    <div ref={setNodeRef} style={style}
+      className="bg-panel/80 backdrop-blur border border-border rounded-2xl flex-shrink-0 flex flex-col"
+      style={{ width: '272px', maxHeight: 'calc(100vh - 80px)', ...style }}>
+      {/* Top gradient bar */}
+      <div className="h-0.5 rounded-t-2xl w-full" style={{ background: gradient }} />
+
+      {/* Header */}
+      <div {...attributes} {...listeners}
+        className="flex items-center justify-between px-4 py-3 cursor-grab active:cursor-grabbing select-none">
         {isEditingTitle ? (
-          <input
-            autoFocus
-            value={columnTitle}
-            onChange={(e) => setColumnTitle(e.target.value)}
+          <input autoFocus value={columnTitle} onChange={(e) => setColumnTitle(e.target.value)}
             onBlur={() => { onColumnRename(columnTitle.trim() || column.title); setIsEditingTitle(false) }}
-            className="font-serif italic text-lg bg-white border-b border-black px-1 w-full focus:outline-none"
-          />
-        ) : (
-          <div className="flex flex-col">
-             <span className="text-[9px] uppercase tracking-[0.3em] text-gray-300 font-bold mb-1">Section</span>
-             <h3
-                onDoubleClick={(e) => { e.stopPropagation(); setIsEditingTitle(true) }}
-                className="font-serif font-bold text-xl text-black group-hover:italic transition-all"
-              >
-                {column.title}
-              </h3>
-          </div>
-        )}
-        <div className="flex items-center gap-3">
-          <span className="text-[10px] font-mono text-gray-400">[{column.cards.length}]</span>
-          <button
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') { onColumnRename(columnTitle.trim() || column.title); setIsEditingTitle(false) }
+              if (e.key === 'Escape') { setColumnTitle(column.title); setIsEditingTitle(false) }
+            }}
             onPointerDown={(e) => e.stopPropagation()}
-            onClick={() => { if (confirm(`Delete section "${column.title}"?`)) onColumnDelete() }}
-            className="text-gray-300 hover:text-black transition-colors text-xl"
-          >
-            ×
-          </button>
+            className="bg-void border border-accent/40 rounded-lg px-2 py-1 text-sm text-textMain w-full mr-2 focus:outline-none" />
+        ) : (
+          <h3 onDoubleClick={(e) => { e.stopPropagation(); setIsEditingTitle(true) }}
+            className="text-sm font-semibold text-textMain flex-1 truncate" style={{ fontFamily: 'Syne, sans-serif' }}>
+            {column.title}
+          </h3>
+        )}
+        <div className="flex items-center gap-2 ml-2">
+          <span className="text-xs text-muted bg-void/60 border border-border px-2 py-0.5 rounded-full">
+            {column.cards.length}
+          </span>
+          <button onPointerDown={(e) => e.stopPropagation()}
+            onClick={() => { if (confirm(`"${column.title}" sütununu sil?`)) onColumnDelete() }}
+            className="text-muted hover:text-red-400 text-xl leading-none transition-colors">×</button>
         </div>
       </div>
 
-      {/* Cards Area - Daha havadar */}
-      <div className="flex-1 overflow-y-auto px-2 pb-4 flex flex-col gap-4 scrollbar-hide">
+      {/* Cards */}
+      <div className="flex-1 overflow-y-auto px-3 pb-2 flex flex-col gap-2">
         <SortableContext items={column.cards.map(c => c.id)} strategy={verticalListSortingStrategy}>
           {column.cards.map(card => (
-            <CardItem
-              key={card.id}
-              card={card}
+            <CardItem key={card.id} card={card}
               onUpdate={(updates) => onCardUpdate(card.id, updates)}
-              onDelete={() => onCardDelete(card.id)}
-            />
+              onDelete={() => onCardDelete(card.id)} />
           ))}
         </SortableContext>
+        {column.cards.length === 0 && !isAdding && (
+          <div className="border border-dashed border-border/50 rounded-xl h-16 flex items-center justify-center">
+            <span className="text-xs text-muted">Kart yok</span>
+          </div>
+        )}
       </div>
 
-      {/* Add Entry - Metin Odaklı */}
-      <div className="p-4 mt-auto">
+      {/* Add card */}
+      <div className="p-3 border-t border-border/60">
         {isAdding ? (
-          <div className="bg-white border border-black p-3 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-            <input
-              autoFocus
-              type="text"
-              placeholder="Entry Title..."
-              value={newCardTitle}
-              onChange={(e) => setNewCardTitle(e.target.value)}
-              className="w-full text-sm font-serif italic border-b border-gray-100 pb-1 mb-3 focus:outline-none focus:border-black"
-            />
-            <div className="flex gap-4">
-              <button
-                onClick={async () => {
-                  if (newCardTitle.trim()) { await onCardAdd(newCardTitle.trim()); setNewCardTitle(''); setIsAdding(false) }
-                }}
-                className="text-[10px] font-bold uppercase tracking-widest border-b-2 border-black"
-              >
-                Add
+          <>
+            <input autoFocus type="text" placeholder="Görev başlığı..."
+              value={newCardTitle} onChange={(e) => setNewCardTitle(e.target.value)}
+              onKeyDown={async (e) => {
+                if (e.key === 'Enter' && newCardTitle.trim()) { await onCardAdd(newCardTitle.trim()); setNewCardTitle(''); setIsAdding(false) }
+                if (e.key === 'Escape') { setNewCardTitle(''); setIsAdding(false) }
+              }}
+              className="w-full bg-void border border-border rounded-xl px-3 py-2.5 text-sm text-textMain placeholder-muted focus:outline-none focus:border-accent transition-colors mb-2" />
+            <div className="flex gap-2">
+              <button onClick={async () => { if (newCardTitle.trim()) { await onCardAdd(newCardTitle.trim()); setNewCardTitle(''); setIsAdding(false) } }}
+                className="text-xs font-semibold px-4 py-2 rounded-xl transition-all"
+                style={{ background: 'linear-gradient(135deg, #c084fc, #f472b6)', color: '#06040f' }}>
+                Ekle
               </button>
-              <button
-                onClick={() => { setNewCardTitle(''); setIsAdding(false) }}
-                className="text-[10px] font-bold uppercase tracking-widest text-gray-400"
-              >
-                Cancel
-              </button>
+              <button onClick={() => { setNewCardTitle(''); setIsAdding(false) }}
+                className="text-xs text-textDim px-3 py-2 rounded-xl hover:bg-void transition-colors">İptal</button>
             </div>
-          </div>
+          </>
         ) : (
-          <button
-            onClick={() => setIsAdding(true)}
-            className="w-full text-left text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 hover:text-black transition-all border-t border-gray-100 pt-4"
-          >
-            + New Entry
+          <button onClick={() => setIsAdding(true)}
+            className="w-full text-sm text-textDim hover:text-accent py-2 rounded-xl hover:bg-void/60 transition-colors">
+            + Kart Ekle
           </button>
         )}
       </div>
