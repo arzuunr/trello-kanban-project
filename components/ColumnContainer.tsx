@@ -36,32 +36,48 @@ export default function ColumnContainer({ column, onCardAdd, onCardUpdate, onCar
   const gradient = GRADIENTS[parseInt(column.id.slice(-1), 16) % GRADIENTS.length]
 
   if (isDragging) {
-    return <div ref={setNodeRef} style={style}
-      className="bg-panel/50 border border-dashed border-accent/30 rounded-2xl w-68 min-h-32 opacity-40 flex-shrink-0" style={{ width: '272px', ...style }} />
+    return (
+      <div
+        ref={setNodeRef}
+        style={{ ...style, width: '272px' }}
+        className="bg-panel/50 border border-dashed border-accent/30 rounded-2xl min-h-32 opacity-40 flex-shrink-0"
+      />
+    )
   }
 
   return (
-    <div ref={setNodeRef} style={style}
+    <div
+      ref={setNodeRef}
+      style={{ ...style, width: '272px', maxHeight: 'calc(100vh - 80px)' }}
       className="bg-panel/80 backdrop-blur border border-border rounded-2xl flex-shrink-0 flex flex-col"
-      style={{ width: '272px', maxHeight: 'calc(100vh - 80px)', ...style }}>
+    >
       {/* Top gradient bar */}
       <div className="h-0.5 rounded-t-2xl w-full" style={{ background: gradient }} />
 
       {/* Header */}
-      <div {...attributes} {...listeners}
-        className="flex items-center justify-between px-4 py-3 cursor-grab active:cursor-grabbing select-none">
+      <div
+        {...attributes}
+        {...listeners}
+        className="flex items-center justify-between px-4 py-3 cursor-grab active:cursor-grabbing select-none"
+      >
         {isEditingTitle ? (
-          <input autoFocus value={columnTitle} onChange={(e) => setColumnTitle(e.target.value)}
+          <input
+            autoFocus
+            value={columnTitle}
+            onChange={(e) => setColumnTitle(e.target.value)}
             onBlur={() => { onColumnRename(columnTitle.trim() || column.title); setIsEditingTitle(false) }}
             onKeyDown={(e) => {
               if (e.key === 'Enter') { onColumnRename(columnTitle.trim() || column.title); setIsEditingTitle(false) }
               if (e.key === 'Escape') { setColumnTitle(column.title); setIsEditingTitle(false) }
             }}
             onPointerDown={(e) => e.stopPropagation()}
-            className="bg-void border border-accent/40 rounded-lg px-2 py-1 text-sm text-textMain w-full mr-2 focus:outline-none" />
+            className="bg-void border border-accent/40 rounded-lg px-2 py-1 text-sm text-textMain w-full mr-2 focus:outline-none"
+          />
         ) : (
-          <h3 onDoubleClick={(e) => { e.stopPropagation(); setIsEditingTitle(true) }}
-            className="text-sm font-semibold text-textMain flex-1 truncate" style={{ fontFamily: 'Syne, sans-serif' }}>
+          <h3
+            onDoubleClick={(e) => { e.stopPropagation(); setIsEditingTitle(true) }}
+            className="text-sm font-semibold text-textMain flex-1 truncate"
+          >
             {column.title}
           </h3>
         )}
@@ -69,9 +85,11 @@ export default function ColumnContainer({ column, onCardAdd, onCardUpdate, onCar
           <span className="text-xs text-muted bg-void/60 border border-border px-2 py-0.5 rounded-full">
             {column.cards.length}
           </span>
-          <button onPointerDown={(e) => e.stopPropagation()}
+          <button
+            onPointerDown={(e) => e.stopPropagation()}
             onClick={() => { if (confirm(`"${column.title}" sütununu sil?`)) onColumnDelete() }}
-            className="text-muted hover:text-red-400 text-xl leading-none transition-colors">×</button>
+            className="text-muted hover:text-red-400 text-xl leading-none transition-colors"
+          >×</button>
         </div>
       </div>
 
@@ -79,9 +97,12 @@ export default function ColumnContainer({ column, onCardAdd, onCardUpdate, onCar
       <div className="flex-1 overflow-y-auto px-3 pb-2 flex flex-col gap-2">
         <SortableContext items={column.cards.map(c => c.id)} strategy={verticalListSortingStrategy}>
           {column.cards.map(card => (
-            <CardItem key={card.id} card={card}
+            <CardItem
+              key={card.id}
+              card={card}
               onUpdate={(updates) => onCardUpdate(card.id, updates)}
-              onDelete={() => onCardDelete(card.id)} />
+              onDelete={() => onCardDelete(card.id)}
+            />
           ))}
         </SortableContext>
         {column.cards.length === 0 && !isAdding && (
@@ -95,26 +116,49 @@ export default function ColumnContainer({ column, onCardAdd, onCardUpdate, onCar
       <div className="p-3 border-t border-border/60">
         {isAdding ? (
           <>
-            <input autoFocus type="text" placeholder="Görev başlığı..."
-              value={newCardTitle} onChange={(e) => setNewCardTitle(e.target.value)}
+            <input
+              autoFocus
+              type="text"
+              placeholder="Görev başlığı..."
+              value={newCardTitle}
+              onChange={(e) => setNewCardTitle(e.target.value)}
               onKeyDown={async (e) => {
-                if (e.key === 'Enter' && newCardTitle.trim()) { await onCardAdd(newCardTitle.trim()); setNewCardTitle(''); setIsAdding(false) }
+                if (e.key === 'Enter' && newCardTitle.trim()) {
+                  await onCardAdd(newCardTitle.trim())
+                  setNewCardTitle('')
+                  setIsAdding(false)
+                }
                 if (e.key === 'Escape') { setNewCardTitle(''); setIsAdding(false) }
               }}
-              className="w-full bg-void border border-border rounded-xl px-3 py-2.5 text-sm text-textMain placeholder-muted focus:outline-none focus:border-accent transition-colors mb-2" />
+              className="w-full bg-void border border-border rounded-xl px-3 py-2.5 text-sm text-textMain placeholder-muted focus:outline-none focus:border-accent transition-colors mb-2"
+            />
             <div className="flex gap-2">
-              <button onClick={async () => { if (newCardTitle.trim()) { await onCardAdd(newCardTitle.trim()); setNewCardTitle(''); setIsAdding(false) } }}
+              <button
+                onClick={async () => {
+                  if (newCardTitle.trim()) {
+                    await onCardAdd(newCardTitle.trim())
+                    setNewCardTitle('')
+                    setIsAdding(false)
+                  }
+                }}
                 className="text-xs font-semibold px-4 py-2 rounded-xl transition-all"
-                style={{ background: 'linear-gradient(135deg, #c084fc, #f472b6)', color: '#06040f' }}>
+                style={{ background: 'linear-gradient(135deg, #c084fc, #f472b6)', color: '#06040f' }}
+              >
                 Ekle
               </button>
-              <button onClick={() => { setNewCardTitle(''); setIsAdding(false) }}
-                className="text-xs text-textDim px-3 py-2 rounded-xl hover:bg-void transition-colors">İptal</button>
+              <button
+                onClick={() => { setNewCardTitle(''); setIsAdding(false) }}
+                className="text-xs text-textDim px-3 py-2 rounded-xl hover:bg-void transition-colors"
+              >
+                İptal
+              </button>
             </div>
           </>
         ) : (
-          <button onClick={() => setIsAdding(true)}
-            className="w-full text-sm text-textDim hover:text-accent py-2 rounded-xl hover:bg-void/60 transition-colors">
+          <button
+            onClick={() => setIsAdding(true)}
+            className="w-full text-sm text-textDim hover:text-accent py-2 rounded-xl hover:bg-void/60 transition-colors"
+          >
             + Kart Ekle
           </button>
         )}
