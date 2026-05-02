@@ -1,12 +1,15 @@
 'use client'
-import { useState } from 'react'
+// 1. useState importu eklendi
+import { useState } from 'react' 
 import { 
   DndContext, DragOverlay, PointerSensor, TouchSensor, 
   useSensor, useSensors, DragStartEvent, DragEndEvent, DragOverEvent, 
   closestCorners 
-} from '@nd-kit/core'
-import { SortableContext, horizontalListSortingStrategy, arrayMove } from '@nd-kit/sortable'
-import { supabase } from '@/lib/supabase'
+} from '@dnd-kit/core'
+import { SortableContext, horizontalListSortingStrategy, arrayMove } from '@dnd-kit/sortable'
+
+// 2. Proje yapına göre bu yolları kontrol et
+import { supabase } from '@/lib/supabase' 
 import ColumnContainer from './ColumnContainer'
 import CardItem from './CardItem'
 
